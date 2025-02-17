@@ -1,0 +1,9 @@
+.container{
+    width: 65vw;
+    height: 98vh;
+    color:black;
+    background-color: #f0f2f5;
+    top: 2vh;
+    left: 35vw;
+    position: absolute;
+}
