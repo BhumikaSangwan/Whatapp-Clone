@@ -1,0 +1,22 @@
+.container{
+    background-color: #f0f2f5;
+    border-radius: 40%;
+    padding: 6px 10px;
+    margin: 0 5px;
+    color: #54656F;
+    font-weight: 400;
+    border: none;
+    cursor: pointer;
+
+    &:not(:focus):hover {
+        background-color: #d4d5d7;
+    }
+    
+    &:focus {
+        background-color: #E7FCE3;
+        color: #008069;
+        border: none;
+        outline: none;
+    }
+
+}

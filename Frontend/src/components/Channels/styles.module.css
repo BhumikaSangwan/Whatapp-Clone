@@ -1,0 +1,115 @@
+.head {
+    height: 3vh;
+    align-items: self-start;
+    margin: 4px 8px;
+    padding: 10px;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+.chats {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    height: 5vh;
+}
+
+.heading {
+    display: flex;
+    justify-content: space-around;
+    gap: 35px
+}
+
+.icon {
+    cursor: pointer;
+    color: #54656f;
+}
+
+.searchBar {
+    background-color: #f0f2f5;
+    width: 88%;
+    margin: 0 auto;
+    height: 2.5vh;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+}
+
+
+.channel{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 5vh;
+    margin: 25px 0;
+}
+
+.showName{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 17px;
+    color: #111B21;
+}
+
+/* .channelDp{
+    margin: 10px 0;
+    margin-left: 15px;
+    height: 49px;
+    width: 49px;
+    object-fit: contain;
+} */
+
+.channelDp {
+    width: 49px;
+    height: 49px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-right: 10px;
+    margin-left: 20px;
+    display: inline-block;
+}
+
+.channelImage {  /* Style specifically for channel image */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* img{
+    max-height: 49px;
+    max-width: 49px;
+    border-radius: 50%;
+} */
+
+.time{
+    display: flex;
+    justify-content: flex-end;
+    font-size: 12px;
+    color: #667781;
+    right: 20px;
+    position: absolute;
+}
+
+.channelName{
+    width: 100%;
+    margin-left: 10px;
+}
+
+.showMsg{
+    margin-left: 8px;
+}
+
+.info{
+    margin-left: 5px;
+    width: 80%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    left: 15%;
+    position: absolute;
+    margin-top: 10px;
+}

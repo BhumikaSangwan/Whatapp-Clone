@@ -1,0 +1,85 @@
+.head {
+    height: 3vh;
+    align-items: self-start;
+    margin: 4px 8px;
+    padding: 10px;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+
+.heading {
+    gap: 35px;
+    height: 5vh;
+    margin-bottom: 10px;
+}
+
+.searchBar {
+    background-color: #f0f2f5;
+    width: 88%;
+    margin: 0 auto;
+    height: 2.5vh;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    margin-top: 25px;
+}
+
+.myProfile{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 10px;
+
+    &:hover{
+        background-color: #f0f2f5;
+    }
+}
+
+.profile{
+    height: 82px;
+    width: 82px;
+    object-fit: contain;
+    padding: 8px 16px;
+}
+
+.name{
+    font-size: 17px;
+    color: #111B21;
+}
+
+.about{
+    font-size: 14px;
+    color:#54656F
+}
+
+.moreInfo{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-left: 10px;
+
+    &:hover{
+        background-color: #f0f2f5;
+    }
+}
+
+.icon{
+    padding: 8px 16px;
+}
+
+.iconName{
+    color: #111B21;
+    font-size: 17px;
+    padding: 8px 0;
+    width: 80%;
+    border-bottom: 1px solid #f0f2f5;
+    margin-left: 8px;
+    padding-bottom: 18px;
+}
+
+.logOut{
+    color: #EA0038
+}

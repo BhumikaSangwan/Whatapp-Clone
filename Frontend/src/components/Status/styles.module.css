@@ -1,0 +1,177 @@
+.container {
+    display: block;
+    position: fixed;
+    top: 2vh;
+    left: 5vw;
+    height: 96vh;
+    width: 30vw;
+    background-color: rgb(255, 255, 255);
+    border-right: 2px solid rgb(202, 199, 199) !important;
+    border-left: 2px solid rgb(202, 199, 199);
+    min-width: 100px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.head {
+    height: 3vh;
+    align-items: self-start;
+    margin: 4px 8px;
+    padding: 10px;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+.myProfile {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+/* .addStatus {
+    position: fixed;
+    top: 15.1%;
+    left: 9%;
+    background-color: #008069;
+    max-height: 16px;
+    display: flex;
+    align-items: end;
+    border-radius: "50%";
+    border: 2px solid white;
+    padding: 2px;
+    color: white
+} */
+
+.dp {
+    top: 12%;
+    left: 4%;
+    position: absolute;
+}
+
+.addButton {
+    background-color: #008069;
+    color: red;
+    border-radius: 50%;
+    border: 3px solid white;
+    max-height: 15px;
+    top: 15%;
+    left: 40%;
+    position: absolute;
+}
+
+.addDetails{
+    left: 17%;
+    top: 11.8%;
+    position: absolute;
+    font-size: 0.7em;
+    font-weight: 400;
+}
+
+.click{
+    color: #667781;
+    font-size: 0.8125rem;
+}
+
+.border{
+    height: 1.6%;
+    background-color: #f0f2f5;
+    margin-top: 25px;
+    border-top: 1px solid rgb(218, 215, 215);
+    border-bottom: 1px solid rgb(218, 215, 215);
+}
+
+.statusField{
+    overflow-y: scroll;
+    max-height: 75vh;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: rgb(255, 255, 255);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #d4d5d7;
+    }
+
+    &::-webkit-scrollbar-button {
+        display: block;
+        height: 3px;
+        background-color: #d4d5d7;
+        border-radius: 5px;
+        padding: 10px 0;
+    }
+}
+
+.viewed{
+    height: 3%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: #008069;
+    font-size: 16px;
+    margin: 23px 0 23px 36px;
+}
+
+
+.statusHeight{
+    margin: 0
+}
+
+.statusDP{
+    /* width: 10%;
+    display: inline-block;
+    padding: 0 15px 12px 13px; */
+    width: 45px; /* Adjust the size as per your design */
+    height: 47px; /* Maintain equal width and height for a circular look */
+    display: inline-block;
+    padding: 0;
+    padding-right: 7px;
+    padding-bottom: 4px;
+    margin-left: 4px;
+    margin: 8px auto;
+    border-radius: 50%;
+    border: 2px solid white; 
+    outline: 2px solid gainsboro; 
+    outline-offset: 1px;
+}
+
+/* .statusDpHeight{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+} */
+
+.showUploadedData{
+    width: 78%;
+    display: inline-block;
+    margin-bottom: 2px;
+    padding-top: 5px;
+    margin-left: 5px;
+    border-top: 1px solid #e9edef;
+}
+
+.name{
+    color: #111b21;
+    font: 17px
+}
+
+.time{
+    color: #667781;
+    font-size: 14px;
+}
+
+.green{
+    color: #1B8755;
+}
+
+.encrypted{
+    font-size: 12px;
+    color: #667781;
+    display: flex;
+    align-items: center;
+    margin-left: 18%;
+    height: 72px;
+}

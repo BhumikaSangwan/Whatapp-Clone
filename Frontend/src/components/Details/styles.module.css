@@ -1,0 +1,325 @@
+.container {
+    width: 63.6vw;
+    height: 96vh;
+    color: black;
+    background-color: #f0f2f5;
+    top: 2vh;
+    left: 35vw;
+    position: absolute;
+}
+
+.head {
+    height: 9%;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    align-items: center;
+}
+
+.showDP {
+    margin-right: 0;
+    padding-right: 0;
+}
+
+.showBasics {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: 8px !important;
+    padding-left: 0;
+    width: 73%;
+    flex-shrink: 2;
+}
+
+.name {
+    font-size: 1.1em;
+    font-weight: 400;
+    animation: moveDown 0.1s ease-in-out 4.3s forwards;
+    transform: translateY(0);
+    /* transition: margin 0.5s ease; */
+    /* margin-top: 0; */
+    /* opacity: 1;
+    transition: opacity 0.5s ease, max-height 0.5s ease, margin 0.5s ease; */
+}
+
+.basicInfo {
+    font-size: 0.8em;
+    color: gray;
+    animation: fadeUp 0.1s ease-in-out forwards 4s;
+    /* opacity: 0;
+    overflow: hidden;
+    transition: opacity 0.5s ease, max-height 0.5s ease, margin 0.5s ease; */
+}
+
+.animate {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+@keyframes fadeUp {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-15px);
+        opacity: 0;
+    }
+}
+
+@keyframes moveDown {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY( 10px);
+    }
+}
+
+.others {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    size: 1.2rem;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.others>div {
+    padding: 0 10px;
+}
+
+.body {
+    height: 91%;
+    background-color: beige;
+    display: flex;
+    flex-direction: column;
+}
+
+.call {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    color: #54656f;
+    border: 2px solid gainsboro;
+    border-radius: 40%;
+    width: 20%;
+    padding-top: 10px;
+}
+
+.videoCall {
+    padding-right: 10px;
+    padding-top: 5px;
+}
+
+.dir {
+    transform: rotate(90deg);
+    padding-top: 6px;
+}
+
+.menu {
+    height: 40px;
+    width: 40px;
+}
+
+.commonStyle {
+    min-height: 30px;
+    min-width: 40px;
+}
+
+.lens {
+    width: 35px !important;
+    height: 35px !important;
+}
+
+.description {
+    height: 90%;
+    background-image: url(../Images/whatsappWallpaper.jpg);
+    background-size: contain;
+    object-fit: contain;
+    display: flex;
+    flex-direction: column;
+}
+
+.alignMsg {
+    display: flex;
+    width: 90%;
+    margin-left: 5%;
+    gap: 8px; 
+    margin-bottom: 10px; 
+  }
+
+  .showMsg {
+  }
+
+  /* .alignLeft{
+    justify-content: flex-start;
+  } */
+
+  .alignRight {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .alignLeft{
+    display: flex;
+    justify-content: flex-start;
+  }
+
+
+.alignRight > .showMsg > .msg{
+    background-color : #dcf8c6;;
+}
+
+.msg{
+    background-color: white;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0 7px 8px 9px;
+    border-radius: 5px;
+    margin-right: 0;
+}
+
+.msgTime{
+    color: #667781;
+    font-size: 11px;
+    padding-top: 17px
+}
+
+.foot {
+    width: 100%;
+    height: 10%;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.attach {
+    margin-right: 5px;
+    padding-left: 20px;
+}
+
+.chatBoard {
+    width: 99%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.emoji {
+    margin: auto 10px;
+}
+
+.keyboard {
+    display: flex;
+    justify-content: space-around;
+    background-color: white;
+    width: 90%;
+    padding-top: 10px;
+    border-radius: 10px;
+}
+
+.chatField {
+    width: 98%;
+    background-color: white;
+}
+
+.chatField>input {
+    background-color: #fff;
+}
+
+.voice {
+    margin: auto 13px;
+}
+
+.downloadContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #54656F;
+    width: 70%;
+    height: 100%;
+    margin-left: 14%;
+    font-size: 0.87em;
+    font-weight: 430;
+}
+
+/* .downloadImg{
+    height: 188px;
+    width: 320px;
+    object-fit: contain;
+} */
+
+.downloadImg {
+    height: 188px !important;
+    width: 320px !important;
+    object-fit: contain;
+}
+
+.downloadImage { /* Style specifically for download image */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.img{
+    max-width: 100%;
+    height: auto;
+}
+
+.dwdMsg {
+    display: block;
+    margin: 20px;
+}
+
+.showMsg {
+    max-width: 75%;
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    margin-top: 5px;
+    text-align: center;
+}
+
+img {
+    width: 320px;
+    height: 188px;
+}
+
+button {
+    background-color: #008069;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 50px;
+}
+
+.highlight {
+    font-size: 2.25rem;
+    font-weight: 325;
+    align-self: center;
+    font: 'SF pro text';
+    margin-bottom: 10px;
+}
+
+.showEncryptedMsg {
+    color: #8696A0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 6%;
+    position: absolute;
+    margin-left: 6%
+}
+
+.encryptionMsg {
+    margin-left: 5px;
+}

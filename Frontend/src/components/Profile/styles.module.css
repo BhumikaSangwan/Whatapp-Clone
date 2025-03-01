@@ -1,0 +1,163 @@
+.main{
+    height: 100%;
+    width: 100%;
+}
+.head {
+    height: 3vh;
+    align-items: self-start;
+    margin: 4px 8px;
+    padding: 10px;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+.heading {
+    gap: 35px;
+    height: 5vh;
+    margin-bottom: 10px;
+}
+
+.addProfile {
+    height: 40%;
+    width: 100%;
+    background-color: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    margin-top: 20px;
+    position: relative;
+}
+
+.profileContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile {
+    width: 200px;
+    height: 200px;
+    background-color: #333; 
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.profile svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    fill: #f0f2f5; 
+}
+
+
+.innerContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    background-color: rgba(86, 84, 84, 0.8); ; /* Remove background from innerContent */
+    opacity: 1; /* reset opacity if you had changed it */
+}
+
+.innerContent > svg, .addInfo {
+    padding: 20% 10px 0 10px;
+    border-radius: 5px;
+    margin: 5px 0; /* Consistent margin for spacing */
+    /* background-color: rgba(86, 84, 84, 0.8);  */
+}
+
+.innerContent span svg {
+    width: 24px;
+    height: 24px;
+    margin-top: 20px; /* Adjust this to move camera down */
+    margin-bottom: 5px;
+}
+
+.addInfo {
+    /* Remove left positioning */
+    text-align: center; /* Center the text */
+    width: auto; /* Let it wrap */
+    margin: 5px 0; /* Consistent margin */
+}
+
+.nameSection {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px 30px 10px; 
+    border-top: 2px solid rgb(234, 232, 232);
+    border-bottom: 2px solid rgb(234, 232, 232);
+}
+
+.nameHeading {
+    color: #008069;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.editName {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Vertically align input and edit icon */
+    width: auto; /* Adjust width as needed */
+    margin-top: 5px; /* Add a small margin between heading and input */
+    background-color: white;
+    margin-bottom: 5px;
+}
+
+.inputName {
+    display: flex;
+    align-items: center;
+    width: 90%; /* Let it take the necessary width */
+    background-color: transparent; /* Remove the background */
+    border: none; /* remove border*/
+    padding: 0; /* remove padding */
+    margin: 0; /* remove margin */
+}
+
+.putName {
+    color: #3B4A54;
+    background-color: white;
+    font-size: 16px;
+    width: 90%; /* Fill the container */
+    border: none; /* Remove border */
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove margin */
+    outline: none; /* Remove outline on focus */
+}
+
+.edit{
+    right: 35px;
+    position: absolute;
+}
+
+.showInfo{
+    color: #54656F;
+    font-size: 14px;
+    padding: 15px 20px 30px 30px;
+    background-color: #f0f2f5;
+}
+
+.other{
+    background-color: #f0f2f5;
+    /* background-color: red; */
+    display: block;
+    height: 20%;
+    width: 100%;
+}

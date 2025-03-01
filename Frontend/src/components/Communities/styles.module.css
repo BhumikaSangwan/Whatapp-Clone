@@ -1,0 +1,52 @@
+.head {
+    height: 3vh;
+    align-items: self-start;
+    margin: 4px 8px;
+    padding: 10px;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+.chats {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    height: 5vh;
+}
+
+.heading {
+    display: flex;
+    justify-content: space-around;
+    gap: 35px
+}
+
+.new{
+    display: flex;
+    margin:4px 8px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.icon{
+    background-color: #00A884;
+    height: 48px;
+    width: 48px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+}
+
+.msg{
+    font-size: 17px;
+    color: #111B21;
+}
+
+.border{
+    height: 1.6%;
+    background-color: #f0f2f5;
+    margin-top: 25px;
+    border-top: 1px solid rgb(218, 215, 215);
+    border-bottom: 1px solid rgb(218, 215, 215);
+}
