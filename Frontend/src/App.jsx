@@ -1,17 +1,20 @@
-import { useState } from 'react'
+import { useState , useEffect} from 'react'
 import Sidebar from './components/Sidebar/index.jsx'
 import Option from './components/Option/index.jsx'
 import Details from './components/Details/index.jsx'
 import './App.css'
 
 function App() {
+  
   const [selectedChat, setSelectedChat] = useState(null);
+  const [me, setMe] = useState(null);
   const [option, setOption] = useState("Chats");
 
-  const handleChatClick = (chatData) => {
-    console.log("chat clicked");
+  const handleChatClick = (chatData, me) => {
+    // console.log("chat clicked");
     setSelectedChat(chatData)
-    console.log(selectedChat)
+    setMe(me);
+    // console.log("selected chat : ",selectedChat)
   }
 
   const handleOption = (selection) => {
@@ -23,7 +26,7 @@ function App() {
         <div className='bgTop'></div>
         <Sidebar className="nav" onSelection={handleOption}/>
         <Option className="option" onChatClick={handleChatClick} option={option}/>
-        <Details className="details" selectedChat={selectedChat}/>
+        <Details className="details" selectedChat={selectedChat} me={me}/>
       </div>
     </>
   )

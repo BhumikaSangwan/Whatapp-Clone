@@ -29,6 +29,17 @@
     position: relative;
 }
 
+.changeProfile{
+    cursor : pointer;
+    position : relative;
+
+    &:hover{
+        .innerContent{
+            display :flex;
+        }
+    }
+}
+
 .profileContainer {
     position: relative;
     display: flex;
@@ -39,7 +50,7 @@
 .profile {
     width: 200px;
     height: 200px;
-    background-color: #333; 
+    background-color: #bebbbb; 
     border-radius: 50%;
     overflow: hidden;
     display: flex;
@@ -58,7 +69,7 @@
 
 
 .innerContent {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -70,29 +81,34 @@
     height: 200px;
     width: 200px;
     border-radius: 50%;
-    background-color: rgba(86, 84, 84, 0.8); ; /* Remove background from innerContent */
-    opacity: 1; /* reset opacity if you had changed it */
+    background-color: rgba(177, 174, 174, 0.8); 
+    opacity: 1; 
+}
+
+.showInnerContent {
+    display: flex;
 }
 
 .innerContent > svg, .addInfo {
     padding: 20% 10px 0 10px;
     border-radius: 5px;
-    margin: 5px 0; /* Consistent margin for spacing */
-    /* background-color: rgba(86, 84, 84, 0.8);  */
+    margin: 5px 0; 
 }
 
 .innerContent span svg {
     width: 24px;
     height: 24px;
-    margin-top: 20px; /* Adjust this to move camera down */
+    margin-top: 20px;
     margin-bottom: 5px;
 }
 
+#inputProfile{
+    display: none;
+}
+
 .addInfo {
-    /* Remove left positioning */
-    text-align: center; /* Center the text */
-    width: auto; /* Let it wrap */
-    margin: 5px 0; /* Consistent margin */
+    text-align: center; 
+    width: auto; 
 }
 
 .nameSection {
@@ -114,32 +130,33 @@
 .editName {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Vertically align input and edit icon */
-    width: auto; /* Adjust width as needed */
-    margin-top: 5px; /* Add a small margin between heading and input */
+    align-items: center; 
+    width: auto;
+    margin-top: 5px; 
     background-color: white;
     margin-bottom: 5px;
 }
 
 .inputName {
     display: flex;
-    align-items: center;
-    width: 90%; /* Let it take the necessary width */
-    background-color: transparent; /* Remove the background */
-    border: none; /* remove border*/
-    padding: 0; /* remove padding */
-    margin: 0; /* remove margin */
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%; 
+    background-color: transparent; 
+    border: none; 
+    padding: 0;
+    margin: 0; 
 }
 
 .putName {
     color: #3B4A54;
     background-color: white;
     font-size: 16px;
-    width: 90%; /* Fill the container */
-    border: none; /* Remove border */
-    padding: 0; /* Remove padding */
-    margin: 0; /* Remove margin */
-    outline: none; /* Remove outline on focus */
+    width: 100%; 
+    border: none; 
+    padding: 0; 
+    margin: 0; 
+    outline: none; 
 }
 
 .edit{

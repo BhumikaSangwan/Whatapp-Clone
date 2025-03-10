@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react'
-import styles from './styles.module.css'
-import Lens from '../Lens/index.jsx'
-import Menu from '../Menu/index.jsx'
-import Add from '../Add/index.jsx'
-import Lock from '../Lock/index.jsx'
-import Seen from '../Seen/index.jsx'
-import TailIn from '../Tail/tailIn.jsx'
-import TailOut from '../Tail/tailOut.jsx'
+import { useState, useEffect, useRef } from "react";
+import styles from "./styles.module.css";
+import Lens from "../Lens/index.jsx";
+import Menu from "../Menu/index.jsx";
+import Add from "../Add/index.jsx";
+import Lock from "../Lock/index.jsx";
+import Seen from "../Seen/index.jsx";
+import TailIn from "../Tail/tailIn.jsx";
+import TailOut from "../Tail/tailOut.jsx";
+import socket from '../Chats/connection.jsx';
 
-
-
-function Details({ selectedChat }) {
+function Details({ selectedChat, me }) {
   const [animate, setAnimate] = useState(false);
+  // const [messages, setMessages] = useState();
 
   useEffect(() => {
     if (selectedChat) {
@@ -20,20 +20,429 @@ function Details({ selectedChat }) {
     }
   }, [selectedChat]);
 
-  return selectedChat ? <Clicked chatData={selectedChat} animate={animate} /> : <Download />;
+
+
+  return selectedChat ? (
+    <Clicked chatData={selectedChat} me={me} />
+  ) : (
+    <Download />
+  );
 }
 
-function Clicked({ chatData }) {
+function Clicked({ chatData, me }) {
+
+
+  const getProfile = async () => {
+    try {
+      const response = await fetch(`http://localhost:9000/whatsapp/getUserProfile?userId=${chatData._id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        if (response.status === 200) {
+          setProfile(null);
+          return;
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      if (response.headers.get('content-type')?.startsWith('image/')) {
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setProfile(imageUrl);
+      } else {
+        setProfile(null);
+      }
+    } catch (error) {
+      console.error('Error fetching about:', error);
+      return "";
+    }
+  }
+
+  useEffect(() => {
+    if (chatData && chatData._id) {
+      getProfile();
+    }
+  }, [chatData?._id]);
+
+  const [profile, setProfile] = useState(null);
+  // const [messages, setMessages] = useState([]);
+  const [msg, setMsg] = useState("");
+  const [chatBody, setChatBody] = useState([]);
+  // const [showImageInput, setShowImageInput] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [basicInfo, setBasicInfo] = useState('click here for contact info');
+  const imageInputRef = useRef(null);
+
+  const [sendIcon, setSendIcon] = useState(<svg
+    viewBox="0 0 24 24"
+    height="24"
+    width="24"
+    preserveAspectRatio="xMidYMid meet"
+    version="1.1"
+    x="0px"
+    y="0px"
+    enableBackground="new 0 0 24 24"
+  >
+    <title>ptt</title>
+    <path
+      fill="currentColor"
+      d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
+    ></path>
+  </svg>);
+
+  // useEffect(() => {
+  //   socket.emit('connected', me[0]._id.toString());
+  // }, []);
+
+  useEffect(() => {
+    socket.on("isOnline", (data) => {
+      if (data) {
+        setBasicInfo('online');
+      }
+      else {
+        setBasicInfo('click here for contact info')
+      }
+    })
+
+    return () => {
+      socket.off("isOnline");
+    }
+  }, [])
+
+  // socket.on("message", (data) => {
+  //   console.log("message through socket : ", data);
+  // })
+
+
+  useEffect(() => {
+    const handleNewMessage = ({ senderId, receiverId, text, createdAtFormatted }) => {
+      console.log("Received text:", text);
+      console.log("received msg time : ", createdAtFormatted);
+
+      // Check if the message is for the currently open chat
+      if (senderId === chatData._id.toString() && receiverId === me[0]._id.toString()) {
+        setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, text, createdAtFormatted }]);
+      }
+    };
+
+    socket.on("getMessage", handleNewMessage);
+
+    return () => {
+      console.log("closing the getMessage socket")
+      socket.off("getMessage", handleNewMessage);
+    };
+  }, [chatData._id, me]);
+
+  useEffect( () => {
+    const handleNewImage = ({senderId, receiverId, image, createdAtFormatted}) => {
+      console.log("received image time : ", createdAtFormatted);
+
+      if (senderId === chatData._id.toString() && receiverId === me[0]._id.toString()) {
+        setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, image, createdAtFormatted }]);
+      }
+    }
+
+      socket.on("getImage", handleNewImage);
+
+      return () => {
+        console.log("closing the getImage socket");
+        socket.off("getImage", handleNewImage);
+      }
+  }, [chatData._id, me]);
+
+
+
+  useEffect(() => {
+    if (!chatData || !me[0]) return;
+
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch(`http://localhost:9000/messages/?receiverId=${chatData._id}&senderId=${me[0]._id}`, {
+          credentials: "include"
+        });
+
+        if (response.ok) {
+          let data = await response.json();
+          socket.emit("checkOnline", chatData._id);
+
+          // data = await Promise.all(data.map(async (user) => {
+          //     if (user.text && user.text.startsWith("http")) {
+          //         try {
+          //             const imageResponse = await fetch(user.text); 
+          //             if (imageResponse.ok) {
+          //                 const blob = await imageResponse.blob(); 
+          //                 const imageUrl = URL.createObjectURL(blob); 
+          //                 return { ...user, image: imageUrl, text: null }; 
+          //             } else {
+          //                 console.error(`Error fetching image: ${user.text}`);
+          //                 return user; 
+          //             }
+          //         } catch (error) {
+          //             console.error(`Error processing image URL: ${user.text}`, error);
+          //             return user; 
+          //         }
+          //     } else {
+          //         return user; 
+          //     }
+          // }));
+
+          setChatBody(data);
+        }
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+
+    fetchMessages();
+  }, [chatData._id, me]);
+
+
+  const sendMessage = async () => {
+    try {
+      const senderId = me[0]._id;
+      const receiverId = chatData._id;
+      const text = msg.trim();
+      const time = getCurrentTimeInHoursAndMinutes()
+
+      if (imagePreview) {
+        handleSendImage();
+      } else if (text) {
+        console.log("msg to be sent : ", text);
+        setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, text, createdAtFormatted: time }]);
+        socket.emit("sendMessage", { senderId, receiverId, text, createdAtFormatted: time });
+        socket.emit("getLastMsg", {senderId, receiverId});
+        setMsg("");
+        setSendIcon(<svg
+          viewBox="0 0 24 24"
+          height="24"
+          width="24"
+          preserveAspectRatio="xMidYMid meet"
+          version="1.1"
+          x="0px"
+          y="0px"
+          enableBackground="new 0 0 24 24"
+        >
+          <title>ptt</title>
+          <path
+            fill="currentColor"
+            d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
+          ></path>
+        </svg>);
+      }
+
+    } catch (error) {
+      console.error("Error sending message:", error.message);
+    }
+  };
+
+  function getCurrentTimeInHoursAndMinutes() {
+    let date = new Date();
+    let hours = date.getHours().toString().padStart(2, '0');
+    let minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`
+  }
+
+  function handleSendIcon(){
+    msg.trim() !== "" ? setSendIcon(<svg
+      viewBox="0 0 24 24"
+      height="24"
+      width="24"
+      preserveAspectRatio="xMidYMid meet"
+      version="1.1"
+      x="0px"
+      y="0px"
+      enableBackground="new 0 0 24 24"
+    >
+      <title>send</title>
+      <path
+        fill="currentColor"
+        d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z"
+      ></path>
+    </svg>) : setSendIcon(<svg
+      viewBox="0 0 24 24"
+      height="24"
+      width="24"
+      preserveAspectRatio="xMidYMid meet"
+      version="1.1"
+      x="0px"
+      y="0px"
+      enableBackground="new 0 0 24 24"
+    >
+      <title>ptt</title>
+      <path
+        fill="currentColor"
+        d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
+      ></path>
+    </svg>)
+  }
+
+  const handleSendImage = async () => {
+    try {
+      const senderId = me[0]._id;
+      const receiverId = chatData._id;
+      const file = imageInputRef.current.files[0];
+      const time = getCurrentTimeInHoursAndMinutes()
+
+      if (file) {
+        const formData = new FormData();
+        formData.append('messages', file);
+        formData.append('senderId', senderId);
+        formData.append('receiverId', receiverId);
+        formData.append('createdAtFormatted', time);
+
+        const response = await fetch('http://localhost:9000/whatsapp/imageMsg', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        });
+        // socket.emit("sendImage", { senderId, receiverId, text: URL.createObjectURL(file), createdAtFormatted: time });
+        // setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, image: data.image, createdAtFormatted: time}]);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("image data : " , data.image);
+          socket.emit("sendImage", {senderId, receiverId, image:data.image, createdAtFormatted: time});
+
+          setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, image: data.image, createdAtFormatted: time }]); 
+          setSendIcon(<svg
+            viewBox="0 0 24 24"
+            height="24"  
+            width="24"
+            preserveAspectRatio="xMidYMid meet"
+            version="1.1"
+            x="0px"
+            y="0px"
+            enableBackground="new 0 0 24 24"
+          >
+            <title>ptt</title>
+            <path
+              fill="currentColor"
+              d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
+            ></path>
+          </svg>);
+        } else {
+          console.error("Image upload failed");
+        }
+      }
+      // setImagePreview(null);
+      // setShowImageInput(false);
+      if (imageInputRef.current) {
+        imageInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Error sending image:", error.message);
+    }
+  };
+
+  // const handleImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setImagePreview(URL.createObjectURL(file));
+  //   }
+  // };
+
+  const chooseSendImage = () => {
+    // setShowImageInput(true);
+    if (imageInputRef.current) {
+      imageInputRef.current.click();
+    }
+    setSendIcon(<svg
+      viewBox="0 0 24 24"
+      height="24"
+      width="24"
+      preserveAspectRatio="xMidYMid meet"
+      version="1.1"
+      x="0px"
+      y="0px"
+      enableBackground="new 0 0 24 24"
+    >
+      <title>send</title>
+      <path
+        fill="currentColor"
+        d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z"
+      ></path>
+    </svg>)
+  };
+
+  // const removePreview = () => {
+  //   setImagePreview(null);
+  //   if (imageInputRef.current) {
+  //     imageInputRef.current.value = "";
+  //   }
+  // };
+
+  // function showPreview(file) {
+  //   const preview = document.createElement('div');
+  //   preview.classList.add('preview');
+  //   preview.append(file);
+  // }
+
+  // sendIcon = (imagePreview || msg.trim !== "") ? (<svg
+  //   viewBox="0 0 24 24"
+  //   height="24"
+  //   width="24"
+  //   preserveAspectRatio="xMidYMid meet"
+  //   version="1.1"
+  //   x="0px"
+  //   y="0px"
+  //   enableBackground="new 0 0 24 24"
+  // >
+  //   <title>send</title>
+  //   <path
+  //     fill="currentColor"
+  //     d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z"
+  //   ></path>
+  // </svg>) : (
+  //   <svg
+  //     viewBox="0 0 24 24"
+  //     height="24"
+  //     width="24"
+  //     preserveAspectRatio="xMidYMid meet"
+  //     version="1.1"
+  //     x="0px"
+  //     y="0px"
+  //     enableBackground="new 0 0 24 24"
+  //   >
+  //     <title>ptt</title>
+  //     <path
+  //       fill="currentColor"
+  //       d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
+  //     ></path>
+  //   </svg>
+  // );
+
 
   return (
     <div className={styles.container}>
       <div className={styles.head}>
         <div className={styles.showDP}>
-          {chatData.dp}
+          {profile === null ? <svg
+            viewBox="0 0 212 212"
+            preserveAspectRatio="xMidYMid meet"
+            className={styles.userProfile}
+            version="1.1"
+            x="0px"
+            y="0px"
+            enableBackground="new 0 0 212 212"
+          >
+            <title>Profile</title>
+            <path fill="#DFE5E7" d="M106.251,0.5C164.653,0.5,212,47.846,212,106.25S164.653,212,106.25,212C47.846,212,0.5,164.654,0.5,106.25 S47.846,0.5,106.251,0.5z" className="xl21vc0"></path>
+            <g>
+              <path fill="#FFFFFF" d="M173.561,171.615c-0.601-0.915-1.287-1.907-2.065-2.955c-0.777-1.049-1.645-2.155-2.608-3.299 c-0.964-1.144-2.024-2.326-3.184-3.527c-1.741-1.802-3.71-3.646-5.924-5.47c-2.952-2.431-6.339-4.824-10.204-7.026 c-1.877-1.07-3.873-2.092-5.98-3.055c-0.062-0.028-0.118-0.059-0.18-0.087c-9.792-4.44-22.106-7.529-37.416-7.529 s-27.624,3.089-37.416,7.529c-0.338,0.153-0.653,0.318-0.985,0.474c-1.431,0.674-2.806,1.376-4.128,2.101 c-0.716,0.393-1.417,0.792-2.101,1.197c-3.421,2.027-6.475,4.191-9.15,6.395c-2.213,1.823-4.182,3.668-5.924,5.47 c-1.161,1.201-2.22,2.384-3.184,3.527c-0.964,1.144-1.832,2.25-2.609,3.299c-0.778,1.049-1.464,2.04-2.065,2.955 c-0.557,0.848-1.033,1.622-1.447,2.324c-0.033,0.056-0.073,0.119-0.104,0.174c-0.435,0.744-0.79,1.392-1.07,1.926 c-0.559,1.068-0.818,1.678-0.818,1.678v0.398c18.285,17.927,43.322,28.985,70.945,28.985c27.678,0,52.761-11.103,71.055-29.095 v-0.289c0,0-0.619-1.45-1.992-3.778C174.594,173.238,174.117,172.463,173.561,171.615z" className="x1d6ck0k"></path>
+              <path fill="#FFFFFF" d="M106.002,125.5c2.645,0,5.212-0.253,7.68-0.737c1.234-0.242,2.443-0.542,3.624-0.896 c1.772-0.532,3.482-1.188,5.12-1.958c2.184-1.027,4.242-2.258,6.15-3.67c2.863-2.119,5.39-4.646,7.509-7.509 c0.706-0.954,1.367-1.945,1.98-2.971c0.919-1.539,1.729-3.155,2.422-4.84c0.462-1.123,0.872-2.277,1.226-3.458 c0.177-0.591,0.341-1.188,0.49-1.792c0.299-1.208,0.542-2.443,0.725-3.701c0.275-1.887,0.417-3.827,0.417-5.811 c0-1.984-0.142-3.925-0.417-5.811c-0.184-1.258-0.426-2.493-0.725-3.701c-0.15-0.604-0.313-1.202-0.49-1.793 c-0.354-1.181-0.764-2.335-1.226-3.458c-0.693-1.685-1.504-3.301-2.422-4.84c-0.613-1.026-1.274-2.017-1.98-2.971 c-2.119-2.863-4.646-5.39-7.509-7.509c-1.909-1.412-3.966-2.643-6.15-3.67c-1.638-0.77-3.348-1.426-5.12-1.958 c-1.181-0.355-2.39-0.655-3.624-0.896c-2.468-0.484-5.035-0.737-7.68-0.737c-21.162,0-37.345,16.183-37.345,37.345 C68.657,109.317,84.84,125.5,106.002,125.5z" className="x1d6ck0k"></path>
+            </g>
+          </svg> :
+            <img src={profile} alt="profile" className={styles.userProfile} />
+          }
         </div>
         <div className={styles.showBasics}>
-          <div className={styles.name}>{chatData.name}</div>
-          <div className={styles.basicInfo}>click here for contact info</div>
+          <div className={styles.name}>{chatData.username}</div>
+          <div className={styles.basicInfo}>
+            {basicInfo}
+          </div>
         </div>
         <div className={`${styles.others} ${styles.commonStyle}`}>
           <div className={`${styles.call} ${styles.commonStyle}`}>
@@ -46,8 +455,14 @@ function Clicked({ chatData }) {
                 fill="none"
               >
                 <title>video-call</title>
-                <path d="M3.27096 7.31042C3 7.82381 3 8.49587 3 9.84V14.16C3 15.5041 3 16.1762 3.27096 16.6896C3.5093 17.1412 3.88961 17.5083 4.35738 17.7384C4.88916 18 5.58531 18 6.9776 18H13.1097C14.502 18 15.1982 18 15.7299 17.7384C16.1977 17.5083 16.578 17.1412 16.8164 16.6896C17.0873 16.1762 17.0873 15.5041 17.0873 14.16V9.84C17.0873 8.49587 17.0873 7.82381 16.8164 7.31042C16.578 6.85883 16.1977 6.49168 15.7299 6.26158C15.1982 6 14.502 6 13.1097 6H6.9776C5.58531 6 4.88916 6 4.35738 6.26158C3.88961 6.49168 3.5093 6.85883 3.27096 7.31042Z" fill="currentColor"></path>
-                <path d="M18.7308 9.60844C18.5601 9.75994 18.4629 9.97355 18.4629 10.1974V13.8026C18.4629 14.0264 18.5601 14.2401 18.7308 14.3916L20.9567 16.3669C21.4879 16.8384 22.3462 16.4746 22.3462 15.778V8.22203C22.3462 7.52542 21.4879 7.16163 20.9567 7.63306L18.7308 9.60844Z" fill="currentColor"></path>
+                <path
+                  d="M3.27096 7.31042C3 7.82381 3 8.49587 3 9.84V14.16C3 15.5041 3 16.1762 3.27096 16.6896C3.5093 17.1412 3.88961 17.5083 4.35738 17.7384C4.88916 18 5.58531 18 6.9776 18H13.1097C14.502 18 15.1982 18 15.7299 17.7384C16.1977 17.5083 16.578 17.1412 16.8164 16.6896C17.0873 16.1762 17.0873 15.5041 17.0873 14.16V9.84C17.0873 8.49587 17.0873 7.82381 16.8164 7.31042C16.578 6.85883 16.1977 6.49168 15.7299 6.26158C15.1982 6 14.502 6 13.1097 6H6.9776C5.58531 6 4.88916 6 4.35738 6.26158C3.88961 6.49168 3.5093 6.85883 3.27096 7.31042Z"
+                  fill="currentColor"
+                ></path>
+                <path
+                  d="M18.7308 9.60844C18.5601 9.75994 18.4629 9.97355 18.4629 10.1974V13.8026C18.4629 14.0264 18.5601 14.2401 18.7308 14.3916L20.9567 16.3669C21.4879 16.8384 22.3462 16.4746 22.3462 15.778V8.22203C22.3462 7.52542 21.4879 7.16163 20.9567 7.63306L18.7308 9.60844Z"
+                  fill="currentColor"
+                ></path>
               </svg>
             </div>
             <div className={styles.dir}>
@@ -64,7 +479,10 @@ function Clicked({ chatData }) {
                   y="0px"
                 >
                   <title>chevron</title>
-                  <path fill="currentColor" d="M11,21.212L17.35,15L11,8.65l1.932-1.932L21.215,15l-8.282,8.282L11,21.212z"></path>
+                  <path
+                    fill="currentColor"
+                    d="M11,21.212L17.35,15L11,8.65l1.932-1.932L21.215,15l-8.282,8.282L11,21.212z"
+                  ></path>
                 </svg>
               </span>
             </div>
@@ -78,105 +496,63 @@ function Clicked({ chatData }) {
         </div>
       </div>
 
-      {/* Body  */}
+      {/* Body */}
+
       <div className={styles.body}>
-        <div className={styles.description}>
-
-          {chatData.messages && chatData.messages.map((message, i) => (
-            message.sender !== "You" ? (
-              <div key={i} className={styles.alignMsg} style={{ display: "flex", justifySelf: "flex-start" }}>
-                <div className={`${styles.showMsg} ${styles.alignLeft}`}>
-                  <TailIn />
-                  <span className={styles.msg}>
-                    <span className={styles.msgText}>{message.text}</span>
-                    <span className={styles.msgTime}>{message.time}</span>
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div key={i} className={`${styles.alignMsg} ${styles.alignRight}`}>
-                <div className={styles.showMsg}>
-                  <span className={styles.msg}>
-                    <span className={styles.msgText}>{message.text}</span>
-                    <span className={styles.msgTime}>{message.time}</span>
-                    <Seen />
-                  </span>
-                  <TailOut />
-                </div>
-              </div>
-            )
+        <div className={styles.description} id="chatBody">
+          {chatBody.map((msg, index) => (
+            <div key={index} >
+              <span >
+                {msg.senderId === me[0]._id.toString() ? (
+                  <div className={`${styles.alignMsg} ${styles.alignRight}`}>
+                    <div className={styles.showMsg} >
+                      <span className={styles.msg}>
+                        {/* <span className={styles.msgText}>{msg.text}</span> */}
+                        {msg.image ? (
+                          <img src={`http://localhost:9000${msg.image}`} alt="message image" className={styles.msgImage} />
+                        ) :
+                          <span className={styles.msgText}>{msg.text}</span>
+                        }
+                        <span className={styles.msgTime}>{msg.createdAtFormatted}</span>
+                        <Seen />
+                      </span>
+                      <TailOut />
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles.alignMsg}>
+                    <div className={`${styles.showMsg} ${styles.alignLeft}`}>
+                      <TailIn />
+                      <span className={styles.msg}>
+                        {msg.image ? (
+                          <img src={`http://localhost:9000${msg.image}`} alt="message image" className={styles.msgImage} />
+                        ) :
+                          <span className={styles.msgText}>{msg.text}</span>
+                        }
+                        <span className={styles.msgTime}>{msg.createdAtFormatted}</span>
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </span>
+            </div>
           ))}
-
-
-          {/* <div className={styles.showMsg}>
-            <TailIn />
-            <span className={styles.msg}>
-              <span className={styles.msgText}>Hello</span>
-              <span className={styles.msgTime}>12:04</span>
-            </span>
-          </div> */}
-          {/* <div className={`${styles.showMsg} ${styles.sentMsg}`}>
-            <span className={styles.msg}>
-              <span className={styles.msgText}>Hii</span>
-              <span className={styles.msgTime}>12:24</span>
-              <Seen />
-            </span>
-            <TailOut />
-          </div> */}
-          {/* <div className="message-out focusable-list-item _amjy _amjz _amjw" aria-label="You  1 bje  12:04 Read  "><span ></span>
-            <div className="_amk4 _amkd _amk5"><span aria-hidden="true" data-icon="tail-out" className="_amk7">
-              <svg
-                viewBox="0 0 8 13"
-                height="13"
-                width="8"
-                preserveAspectRatio="xMidYMid meet"
-                version="1.1"
-                x="0px"
-                y="0px"
-                enableBackground="new 0 0 8 13"
-              >
-                <title>tail-out</title>
-                <path opacity="0.13" d="M5.188,1H0v11.193l6.467-8.625 C7.526,2.156,6.958,1,5.188,1z"></path>
-                <path fill="currentColor" d="M5.188,0H0v11.193l6.467-8.625C7.526,1.156,6.958,0,5.188,0z"></path>
-              </svg></span>
-              <div className="_amk6 _amlo">
-                <span aria-label="You:"></span>
-                <div><div className="x9f619 x1hx0egp x1yrsyyn x1ct7el4 x1dm7udd xwib8y2">
-                  <div className="copyable-text" data-pre-plain-text="[12:04, 15/2/2025] Bhumika Sangwan: ">
-                    <div className="_akbu">
-                      <span dir="ltr" className="_ao3e selectable-text copyable-text" style="min-height: 0px;">
-                        <span >1 bje</span></span>
-                      <span><span className="x3nfvp2 xxymvpz xlshs6z xqtp20y xexx8yu x150jy0e x18d9i69 x1e558r4 x12lo8hy x152skdk" aria-hidden="true">
-                        <span className="x1c4vz4f x2lah0s xn6xy2s"></span>
-                        <span className="x1c4vz4f x2lah0s">12:04</span></span></span></div></div>
-                  <div className="x1n2onr6 x1n327nk x18mqm2i xhsvlbd x11i5rnm xz62fqu xsgj6o6">
-                    <div className="x13yyeie xx3o462 xuxw1ft x78zum5 x6s0dn4 x12lo8hy x152skdk" role="button">
-                      <span className="x1rg5ohu x16dsc37" dir="auto">12:04</span>
-                      <div className="x1pn4fmt x1rg5ohu x1w4ip6v">
-                        <span aria-hidden="false" aria-label=" Read " data-icon="msg-dblcheck" className="x1q15gih">
-                          <svg
-                            viewBox="0 0 16 11"
-                            height="11"
-                            width="16"
-                            preserveAspectRatio="xMidYMid meet"
-                            fill="none">
-                            <title>msg-dblcheck</title>
-                            <path d="M11.0714 0.652832C10.991 0.585124 10.8894 0.55127 10.7667 0.55127C10.6186 0.55127 10.4916 0.610514 10.3858 0.729004L4.19688 8.36523L1.79112 6.09277C1.7488 6.04622 1.69802 6.01025 1.63877 5.98486C1.57953 5.95947 1.51817 5.94678 1.45469 5.94678C1.32351 5.94678 1.20925 5.99544 1.11192 6.09277L0.800883 6.40381C0.707784 6.49268 0.661235 6.60482 0.661235 6.74023C0.661235 6.87565 0.707784 6.98991 0.800883 7.08301L3.79698 10.0791C3.94509 10.2145 4.11224 10.2822 4.29844 10.2822C4.40424 10.2822 4.5058 10.259 4.60313 10.2124C4.70046 10.1659 4.78086 10.1003 4.84434 10.0156L11.4903 1.59863C11.5623 1.5013 11.5982 1.40186 11.5982 1.30029C11.5982 1.14372 11.5348 1.01888 11.4078 0.925781L11.0714 0.652832ZM8.6212 8.32715C8.43077 8.20866 8.2488 8.09017 8.0753 7.97168C7.99489 7.89128 7.8891 7.85107 7.75791 7.85107C7.6098 7.85107 7.4892 7.90397 7.3961 8.00977L7.10411 8.33984C7.01947 8.43717 6.97715 8.54508 6.97715 8.66357C6.97715 8.79476 7.0237 8.90902 7.1168 9.00635L8.1959 10.0791C8.33132 10.2145 8.49636 10.2822 8.69102 10.2822C8.79681 10.2822 8.89838 10.259 8.99571 10.2124C9.09304 10.1659 9.17556 10.1003 9.24327 10.0156L15.8639 1.62402C15.9358 1.53939 15.9718 1.43994 15.9718 1.32568C15.9718 1.1818 15.9125 1.05697 15.794 0.951172L15.4386 0.678223C15.3582 0.610514 15.2587 0.57666 15.1402 0.57666C14.9964 0.57666 14.8715 0.635905 14.7657 0.754395L8.6212 8.32715Z" fill="currentColor"></path></svg></span></div></div></div></div></div><span ></span><div className="_amlr"></div></div><div className="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x13a6bvl x1q0g3np x6s0dn4 _amj_"><div className="x1c4vz4f xs83m0k xdl72j9 x1g77sc7 xeuugli x2lwn1j xozqiw3 x1oa3qoh x12fk4p8 xexx8yu x10ogl3i x18d9i69 x1k2j06m"><div></div></div></div></div><div className="x78zum5 x1n2onr6 xbfrwjf x8k05lb xeq5yr9 x4r51d9 xpvyfi4"></div>
-          </div> */}
         </div>
+
+        <input
+          type="file"
+          accept='image/*'
+          name='messages'
+          ref={imageInputRef}
+          id={styles.inputImage}
+          onChange={handleSendImage}
+        />
 
         <div className={styles.foot}>
           <div className={styles.attach}>
-            <Add />
-            {/* <svg
-              viewBox="0 0 24 24"
-              width="30"
-              preserveAspectRatio="xMidYMid meet"
-              className="x11xpdln x1d8287x x1h4ghdb"
-            >
-              <title>Attach</title>
-              <path fill="currentColor" d="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z"></path>
-            </svg> */}
+            <div onClick={chooseSendImage}>
+              <Add />
+            </div>
           </div>
           <div className={styles.chatBoard}>
             <div className={styles.keyboard}>
@@ -194,31 +570,26 @@ function Clicked({ chatData }) {
                 </svg>
               </div>
               <div className={styles.chatField}>
-                <input
+                <input onChange={(e) => {
+                  setMsg(e.target.value)
+                  handleSendIcon();
+                }}
                   type="text"
                   placeholder='Type a message'
+                  value={msg}
                 />
               </div>
             </div>
-            <div className={styles.voice}>
-              <svg
-                viewBox="0 0 24 24"
-                height="24"
-                width="24"
-                preserveAspectRatio="xMidYMid meet"
-                version="1.1"
-                x="0px"
-                y="0px"
-                enableBackground="new 0 0 24 24"
-              >
-                <title>ptt</title>
-                <path fill="currentColor" d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"></path>
-              </svg>
+            <div className={styles.voice} onClick={sendMessage}>
+              {sendIcon}
             </div>
           </div>
         </div>
       </div>
     </div>
+
+
+
   )
 }
 
@@ -227,7 +598,7 @@ function Download() {
     <div className={styles.container}>
       <div className={styles.downloadContainer}>
         <div className={styles.downloadImg}>
-          <img className={styles.downloadImage}  src="https://static.whatsapp.net/rsrc.php/v4/y6/r/wa669aeJeom.png" />
+          <img className={styles.downloadImage} src="https://static.whatsapp.net/rsrc.php/v4/y6/r/wa669aeJeom.png" />
         </div>
         <div className={`${styles.dwdMsg} ${styles.highlight}`}>
           Download Whatsapp for Windows
@@ -250,4 +621,4 @@ function Download() {
   )
 }
 
-export default Details
+export default Details;

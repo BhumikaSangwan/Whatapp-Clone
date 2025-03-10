@@ -25,7 +25,7 @@ function signUp() {
             console.log("Sign up request sent");
             if (response.ok) {
                 alert("Signup successful! directing to Whatsapp...");
-                window.location.href = "/whatsapp";
+                window.location.href = "/login";
             } else {
                 alert(data.message);
             }

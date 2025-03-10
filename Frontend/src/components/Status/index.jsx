@@ -1,11 +1,32 @@
 import React from 'react'
+import {useState, useEffect} from 'react'
 import styles from './styles.module.css'
 import Head from '../Head/index.jsx'
 import Lock from '../Lock/index.jsx'
-import { ChatData } from '../Chats/index.jsx'
 
 function index() {
-    const chatData = ChatData();
+    // const chatData = ChatData();
+    const [chatData, setChatData] = useState([]);
+
+    useEffect(() => {
+        async function fetchChatData() {
+          try {
+            const response = await fetch("http://localhost:9000/whatsapp/chatList", {
+              method: "GET",
+              credentials: "include"
+            });
+            const data = await response.json();
+            console.log("Received chat data:", data);
+    
+            setChatData(data);
+          } catch (error) {
+            console.error("Error fetching chat data:", error);
+          }
+        }
+    
+        fetchChatData();
+      }, []);
+
     console.log(chatData)
     return (
         <div>

@@ -7,24 +7,43 @@ const Whatsapp = () => {
 
     useEffect(() => {
         async function checkAuth() {
+            console.log("Checking authentication...");
+    
             try {
                 const response = await fetch("http://localhost:9000/whatsapp", {
                     method: "GET",
                     credentials: "include",
                 });
-
-                setIsAuthenticated(response.ok); 
+    
+    
+                // console.log("Response received:", response);
+    
+                if (!response.ok) {
+                    console.error("Response error:", response.status);
+                    setIsAuthenticated(false);
+                    return;
+                }
+    
+                const data = await response.json();
+                // console.log("Auth response data:", data);
+    
+                if (data.message === "Authenticated") {
+                    setIsAuthenticated(true);
+                } else {
+                    setIsAuthenticated(false);
+                }
             } catch (error) {
-                console.error("Error checking authentication:", error);
-                setIsAuthenticated(false); 
+                console.error("Fetch error:", error);
+                setIsAuthenticated(false);
             }
         }
-
+    
         checkAuth();
-        
     }, []);
+    
+
     if (isAuthenticated === null) {
-        return;
+        return <h2>Loading...</h2>;  // Shows loading while waiting for response
     }
 
     return isAuthenticated ? <App /> : <Navigate to="/login" />;

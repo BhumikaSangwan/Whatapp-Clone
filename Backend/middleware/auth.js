@@ -3,24 +3,27 @@ import jwt from "jsonwebtoken";
 const SECRET_KEY = "login-key";
 
 const authMiddleware = (req, res, next) => {
-  try {
     console.log("Middleware execution in WhatsApp route...");
-    console.log("Cookie token:", req.cookies);
+    // console.log("Cookie data:", req.cookies);
 
-    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-    
+    const token = req.cookies.token;
+
     if (!token) {
-      console.log("No token found");
-      return res.status(401).json({ message: "Unauthorized" });
+        console.log("No token found in cookies");
+        return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.userId = decoded.userId;
-    next();
-  } catch (error) {
-    console.error("Auth middleware error:", error);
-    res.status(403).json({ message: "Invalid token" });
-  }
+    jwt.verify(token, SECRET_KEY, (err, decoded) => {
+        if (err) {
+            console.log("Token verification failed:", err.message);
+            return res.status(401).json({ message: "Unauthorized" });
+        } else {
+            req.user = decoded;
+            console.log("token valid");
+            // console.log("User authenticated:", decoded);
+            next();
+        }
+    });
 };
 
 export default authMiddleware;

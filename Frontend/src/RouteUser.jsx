@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "./Auth/login.jsx";
 import SignUp from "./Auth/signUp.jsx";
-import CheckCookies from './Auth/checkCookies.jsx'
 import Whatsapp from './Auth/whatsapp.jsx'
 
 // const PrivateRoute = ({ element }) => {
@@ -17,7 +16,7 @@ function RouteUser() {
       <Route path="/login" element={<Login />} />
       <Route path="/signUp" element={<SignUp />} />
       <Route path='/whatsapp' element={<Whatsapp />} />
-      <Route path='/checkCookies' element={<CheckCookies />} />
+      
     </Routes>
   );
 }

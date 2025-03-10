@@ -1,8 +1,16 @@
 import mongoose from "mongoose";
 
 //connection to database
-async function connectDB(url) {
+async function userDB(url) {
    return mongoose.connect(url);
 }
 
-export default connectDB;
+async function chatDB(url){
+   return mongoose.connect(url);
+}
+
+async function chatListDB(url){
+   return mongoose.connect(url);
+}
+
+export {userDB, chatDB, chatListDB};

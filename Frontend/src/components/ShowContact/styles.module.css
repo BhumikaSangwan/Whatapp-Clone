@@ -66,6 +66,12 @@
     margin-right: 10px;
 }
 
+.profile{
+    height : 49px;
+    width : 49px;
+    border-radius: 50%;
+}
+
 .info {
     flex: 1;
 }
@@ -78,15 +84,27 @@
 
 .name {
     font-weight: bold;
+    font-size: 17px;
 }
 
 .time {
     font-size: 0.8em;
     color: #888;
+    font-size: 14px;
 }
 
 .msg {
     color: #666;
+}
+
+.lastMsg{
+    display: flex;
+    align-items: center;
+    padding-right: 3px;
+}
+
+.lastMsg > svg{
+    padding-right: 2px;
 }
 
 .unread {

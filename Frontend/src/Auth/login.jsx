@@ -14,30 +14,36 @@ function Login() {
     
       const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log("handleSubmit triggered"); // Debugging log
+    
         try {
-          console.log("inside login try block")
-          // if(formData.email.value.trim() === "" || formData.password.value.trim() === ""){
-          //   alert("Please enter email and password");
-          // }
-          const response = await fetch("http://localhost:9000/users/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials : "include",
-            body: JSON.stringify(formData),
-          });
-          console.log("login request sent");
-          const data = await response.json();
-          if (response.ok) {
-            window.location.href = "/whatsapp"; 
-          } else {
-            alert(data.message);
-          }
+            console.log("Inside login try block");
+            
+            const response = await fetch("http://localhost:9000/users/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(formData),
+            });
+    
+            console.log("Login request sent");
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            console.log("Login response:", data);
+    
+            setFormData({ email: "", password: "" });
+            sessionStorage.clear();
+            window.location.href = "/whatsapp";
         } 
         catch (error) {
-          console.log("Error logging in ")
-          console.log("error : ", error)
+            console.error("Error logging in:", error);
         }
-      };
+    };
+    
     
     return (
         <div className={styles.container}>

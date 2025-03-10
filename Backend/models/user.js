@@ -13,6 +13,17 @@ const userSchema = new mongoose.Schema({
     },
     password : {
         type : String
+    },
+    dp : {
+        type: String,
+        default : null
+    },
+    about : {
+        type :String,
+        default : 'Hey there! I am using WhatsApp'
+    },
+    status : {
+        type : Boolean
     }
 },
 {timestamps : true}
