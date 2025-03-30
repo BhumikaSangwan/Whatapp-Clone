@@ -6,7 +6,7 @@ import Seen from '../Seen/index.jsx';
 function index({ chatData, userId }) {
 
   const [profile, setProfile] = useState(null);
-  const [displayMessage, setDisplayMessage] = useState(null);
+  const [displayMessage, setDisplayMessage] = useState("Welcome! Tap the chat icon to start messaging.");
   const [time, setTime] = useState(null);
 
 
@@ -19,7 +19,7 @@ function index({ chatData, userId }) {
         },
         credentials: 'include',
       });
-      console.log("inside getProfile function")
+      // console.log("inside getProfile function")
       if (!response.ok) {
         if (response.status === 200) {
           setProfile(null);
@@ -42,66 +42,40 @@ function index({ chatData, userId }) {
   }
 
   const getLastMessage = async () => {
-    // try {
-    //   const response = await fetch(`http://localhost:9000/messages/lastMessage?receiverId=${chatData._id}&senderId=${senderId}`, {
-    //     method: 'GET',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     credentials: 'include',
-    //   });
-    console.log("getting last message");
     socket.emit("getLastMsg", { senderId: userId, receiverId: chatData._id });
-    //   if (!response.ok) {
-    //     throw new Error(`HTTP error! Status: ${response.status}`);
-    //   }
-    //   const data = await response.json();
-    //   setTime(data.createdAtFormatted)
-    //   if (data.image) {
-    //     setDisplayMessage(
-    //       <span className={styles.lastMsg}>
-    //         <svg
-    //           viewBox="0 0 16 20"
-    //           height="20"
-    //           width="16"
-    //           preserveAspectRatio="xMidYMid meet"
-    //           version="1.1"
-    //           x="0px"
-    //           y="0px"
-    //           enableBackground="new 0 0 16 20"
-    //         >
-    //           <title>status-image</title>
-    //           <path fill="currentColor" d="M13.822,4.668H7.14l-1.068-1.09C5.922,3.425,5.624,3.3,5.409,3.3H3.531 c-0.214,0-0.51,0.128-0.656,0.285L1.276,5.296C1.13,5.453,1.01,5.756,1.01,5.971v1.06c0,0.001-0.001,0.002-0.001,0.003v6.983 c0,0.646,0.524,1.17,1.17,1.17h11.643c0.646,0,1.17-0.524,1.17-1.17v-8.18C14.992,5.191,14.468,4.668,13.822,4.668z M7.84,13.298 c-1.875,0-3.395-1.52-3.395-3.396c0-1.875,1.52-3.395,3.395-3.395s3.396,1.52,3.396,3.395C11.236,11.778,9.716,13.298,7.84,13.298z  M7.84,7.511c-1.321,0-2.392,1.071-2.392,2.392s1.071,2.392,2.392,2.392s2.392-1.071,2.392-2.392S9.161,7.511,7.84,7.511z"></path>
-    //         </svg> {" "}
-    //         Image
-    //       </span>
-    //     )
-    //   }
-    //   else {
-    //     setDisplayMessage(data.text);
-    //   }
-    // } catch (error) {
-    //   console.error('Error fetching about:', error);
-    //   return "";
-    // }
   }
 
   useEffect(() => {
+    // console.log("useeffect")
     getProfile();
     getLastMessage();
   }, [chatData, userId]);
 
+  const [messageKey, setMessageKey] = useState(0);
+
   useEffect(() => {
     function handleLastMsg(user) {
-      console.log("handling last msg : ", user);
+      // console.log("handling last msg : ", user);
       if (
         (user.senderId === chatData._id.toString() && user.receiverId === userId.toString()) ||
         (user.senderId === userId.toString() && user.receiverId === chatData._id.toString())
       ) {
-        if (user.image) {
-          console.log("received msg is an image");
+        setMessageKey((prevKey) => prevKey + 1);
+
+        if(user.text){
+          // console.log("received msg is a text.......");
+
           setDisplayMessage(
             <span className={styles.lastMsg}>
+            {user.senderId === userId.toString() && <Seen/> }
+            {user.text.length > 50 ? user.text.slice(0, 50) + "..." : user.text}
+            </span>
+          );
+        }
+        else if(user.image){
+          // console.log("received msg is an image.........");
+          setDisplayMessage(
+            <span className={styles.lastMsg} key={messageKey}>
               {user.senderId === userId.toString() && <Seen/> }
               <svg
                 viewBox="0 0 16 20"
@@ -118,31 +92,23 @@ function index({ chatData, userId }) {
               </svg> {" "}
               Image
             </span>
-          )  
+          ) 
         }
-        else {
-          console.log("received msg is an image");
-
-          setDisplayMessage(
-            <span className={styles.lastMsg}>
-            {user.senderId === userId.toString() && <Seen/> }
-            {user.text.length > 55 ? user.text.slice(0, 55) + "..." : user.text}
-            </span>
-          );    
-          // setDisplayMessage(displayMessage.length > 35 ? `displayMessage.slice(0,35)...` : displayMessage)
+        else{
+          setDisplayMessage("Welcome! Tap the chat icon to start messaging.")
         }
         setTime(user.createdAtFormatted)
       }
     }
 
-    console.log("handling last message socket");
+    // console.log("handling last message socket");
     socket.on("lastMsg", handleLastMsg);
 
 
     return () => {
       socket.off("lastMsg", handleLastMsg);
     }
-  }, [])
+  }, [chatData, userId, messageKey, displayMessage])
 
   return (
     <div className={styles.container}>

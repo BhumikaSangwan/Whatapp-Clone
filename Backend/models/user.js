@@ -24,6 +24,16 @@ const userSchema = new mongoose.Schema({
     },
     status : {
         type : Boolean
+    }, 
+    state : {
+        type : String,
+        default : "active"
+    },
+    otp : {
+        type : Number
+    },
+    resetToken : {
+        type : String
     }
 },
 {timestamps : true}

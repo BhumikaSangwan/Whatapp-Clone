@@ -10,7 +10,6 @@ import Messages from './models/messageSchema.js';
 import authRouter from './router/auth.js'
 import whatsappRouter from './router/whatsapp.js'
 import chatMessages from './router/chatMessages.js'
-// import chatListRouter from './router/chatList.js'
 import cookieParser from 'cookie-parser';
 
 const app = express();

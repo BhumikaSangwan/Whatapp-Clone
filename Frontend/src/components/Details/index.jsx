@@ -11,7 +11,6 @@ import socket from '../Chats/connection.jsx';
 
 function Details({ selectedChat, me }) {
   const [animate, setAnimate] = useState(false);
-  // const [messages, setMessages] = useState();
 
   useEffect(() => {
     if (selectedChat) {
@@ -31,9 +30,15 @@ function Details({ selectedChat, me }) {
 
 function Clicked({ chatData, me }) {
 
-
   const getProfile = async () => {
-    try {
+/*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Fetches the profile picture of the user with given userId
+   * @function getProfile
+   * @returns {Promise<void>}
+   * @throws {Error} HTTP error! Status: ${response.status}
+   */
+/******  8c945c14-9d4b-4d00-aed7-cc57f1fe58f9  *******/    try {
       const response = await fetch(`http://localhost:9000/whatsapp/getUserProfile?userId=${chatData._id}`, {
         method: 'GET',
         headers: {
@@ -69,13 +74,36 @@ function Clicked({ chatData, me }) {
   }, [chatData?._id]);
 
   const [profile, setProfile] = useState(null);
-  // const [messages, setMessages] = useState([]);
   const [msg, setMsg] = useState("");
   const [chatBody, setChatBody] = useState([]);
-  // const [showImageInput, setShowImageInput] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
   const [basicInfo, setBasicInfo] = useState('click here for contact info');
   const imageInputRef = useRef(null);
+  const [isPreviewHidden, setIsPreviewHidden] = useState(true);
+  const [isEmojiHidden, setIsEmojiHidden] = useState(true);
+  const [imageUrl, setImageUrl] = useState(null);
+  const close = <svg
+    viewBox="0 0 24 24"
+    height="24"
+    width="24"
+    preserveAspectRatio="xMidYMid meet"
+    fill="currentColor"
+    enableBackground="new 0 0 24 24"
+  >
+    <title>x</title>
+    <path d="M19.6004 17.2L14.3004 11.9L19.6004 6.60005L17.8004 4.80005L12.5004 10.2L7.20039 4.90005L5.40039 6.60005L10.7004 11.9L5.40039 17.2L7.20039 19L12.5004 13.7L17.8004 19L19.6004 17.2Z"></path>
+  </svg>
+  const emojis = [
+    "😀", "😃", "😄", "😁", "😆", "🥹", "😅", "😂", "🤣", "🥲", "☺️", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘",
+    "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🥸", "🤩", "🥳", "🙂‍↕️", "😏", "😒", "🙂‍↔️", "😞",
+    "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶",
+    "😶‍🌫️", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🫣", "🤭", "🫢", "🫡", "🤫", "🫠", "🤥", "😶", "🫥", "😐", "🫤", "😑",
+    "🫨", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😮‍💨", "😵", "😵‍💫", "🤐", "🥴", "🤢", "🤮", "🤧",
+    "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸",
+    "😹", "😻", "😼", "😽", "🙀", "😿", "😾", "🫶", "🤲", "👐", "🙌", "👏", "🤝", "👍", "👎", "👊", "✊", "🤛", "🤜", "🫷",
+    "🤞", "✌️", "🫰", "🤟", "🤘", "👌", "🤌", "🤏", "🫳", "🫴", "👈", "👉", "👆", "👇", "☝️", "✋", "🤚", "🖐️", "🖖", "👋",
+    "🤙", "🫲", "🫱", "💪", "🦾", "✍️", "🙏", "👁️", "👀", "🫀", "🫁", "🧠", "🗣️", "👤", "👥", "🫂", "👶", "👧", "🧒", "👦",
+    "👩", "🧑", "👨", "👩‍🦱", "🧑‍🦱", "👱‍♀️", "👱", "🤦‍♀️", "🤦‍♂️", "🤷‍♀️", "💁‍♀️", "💁"
+  ];
 
   const [sendIcon, setSendIcon] = useState(<svg
     viewBox="0 0 24 24"
@@ -94,9 +122,6 @@ function Clicked({ chatData, me }) {
     ></path>
   </svg>);
 
-  // useEffect(() => {
-  //   socket.emit('connected', me[0]._id.toString());
-  // }, []);
 
   useEffect(() => {
     socket.on("isOnline", (data) => {
@@ -113,17 +138,9 @@ function Clicked({ chatData, me }) {
     }
   }, [])
 
-  // socket.on("message", (data) => {
-  //   console.log("message through socket : ", data);
-  // })
-
 
   useEffect(() => {
     const handleNewMessage = ({ senderId, receiverId, text, createdAtFormatted }) => {
-      console.log("Received text:", text);
-      console.log("received msg time : ", createdAtFormatted);
-
-      // Check if the message is for the currently open chat
       if (senderId === chatData._id.toString() && receiverId === me[0]._id.toString()) {
         setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, text, createdAtFormatted }]);
       }
@@ -132,26 +149,23 @@ function Clicked({ chatData, me }) {
     socket.on("getMessage", handleNewMessage);
 
     return () => {
-      console.log("closing the getMessage socket")
       socket.off("getMessage", handleNewMessage);
     };
   }, [chatData._id, me]);
 
-  useEffect( () => {
-    const handleNewImage = ({senderId, receiverId, image, createdAtFormatted}) => {
-      console.log("received image time : ", createdAtFormatted);
+  useEffect(() => {
+    const handleNewImage = ({ senderId, receiverId, image, createdAtFormatted }) => {
 
       if (senderId === chatData._id.toString() && receiverId === me[0]._id.toString()) {
         setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, image, createdAtFormatted }]);
       }
     }
 
-      socket.on("getImage", handleNewImage);
+    socket.on("getImage", handleNewImage);
 
-      return () => {
-        console.log("closing the getImage socket");
-        socket.off("getImage", handleNewImage);
-      }
+    return () => {
+      socket.off("getImage", handleNewImage);
+    }
   }, [chatData._id, me]);
 
 
@@ -168,28 +182,6 @@ function Clicked({ chatData, me }) {
         if (response.ok) {
           let data = await response.json();
           socket.emit("checkOnline", chatData._id);
-
-          // data = await Promise.all(data.map(async (user) => {
-          //     if (user.text && user.text.startsWith("http")) {
-          //         try {
-          //             const imageResponse = await fetch(user.text); 
-          //             if (imageResponse.ok) {
-          //                 const blob = await imageResponse.blob(); 
-          //                 const imageUrl = URL.createObjectURL(blob); 
-          //                 return { ...user, image: imageUrl, text: null }; 
-          //             } else {
-          //                 console.error(`Error fetching image: ${user.text}`);
-          //                 return user; 
-          //             }
-          //         } catch (error) {
-          //             console.error(`Error processing image URL: ${user.text}`, error);
-          //             return user; 
-          //         }
-          //     } else {
-          //         return user; 
-          //     }
-          // }));
-
           setChatBody(data);
         }
       } catch (error) {
@@ -203,35 +195,22 @@ function Clicked({ chatData, me }) {
 
   const sendMessage = async () => {
     try {
+      handleSendIcon();
       const senderId = me[0]._id;
       const receiverId = chatData._id;
       const text = msg.trim();
       const time = getCurrentTimeInHoursAndMinutes()
 
-      if (imagePreview) {
-        handleSendImage();
-      } else if (text) {
+      setIsEmojiHidden(true);
+      if (text) {
         console.log("msg to be sent : ", text);
         setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, text, createdAtFormatted: time }]);
         socket.emit("sendMessage", { senderId, receiverId, text, createdAtFormatted: time });
-        socket.emit("getLastMsg", {senderId, receiverId});
+        socket.emit("getLastMsg", { senderId, receiverId });
         setMsg("");
-        setSendIcon(<svg
-          viewBox="0 0 24 24"
-          height="24"
-          width="24"
-          preserveAspectRatio="xMidYMid meet"
-          version="1.1"
-          x="0px"
-          y="0px"
-          enableBackground="new 0 0 24 24"
-        >
-          <title>ptt</title>
-          <path
-            fill="currentColor"
-            d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
-          ></path>
-        </svg>);
+      }
+      else if (imageUrl) {
+        handleSendImage();
       }
 
     } catch (error) {
@@ -246,38 +225,96 @@ function Clicked({ chatData, me }) {
     return `${hours}:${minutes}`
   }
 
-  function handleSendIcon(){
-    msg.trim() !== "" ? setSendIcon(<svg
-      viewBox="0 0 24 24"
-      height="24"
-      width="24"
-      preserveAspectRatio="xMidYMid meet"
-      version="1.1"
-      x="0px"
-      y="0px"
-      enableBackground="new 0 0 24 24"
-    >
-      <title>send</title>
-      <path
-        fill="currentColor"
-        d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z"
-      ></path>
-    </svg>) : setSendIcon(<svg
-      viewBox="0 0 24 24"
-      height="24"
-      width="24"
-      preserveAspectRatio="xMidYMid meet"
-      version="1.1"
-      x="0px"
-      y="0px"
-      enableBackground="new 0 0 24 24"
-    >
-      <title>ptt</title>
-      <path
-        fill="currentColor"
-        d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
-      ></path>
-    </svg>)
+  function handleSendIcon() {
+    if (msg.trim() !== "" || imageUrl) {
+      setSendIcon(
+        <svg
+          viewBox="0 0 24 24"
+          height="24"
+          width="24"
+          preserveAspectRatio="xMidYMid meet"
+          version="1.1"
+          x="0px"
+          y="0px"
+          enableBackground="new 0 0 24 24"
+        >
+          <title>send</title>
+          <path
+            fill="currentColor"
+            d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z"
+          ></path>
+        </svg>
+      );
+    } else {
+      setSendIcon(
+        <svg
+          viewBox="0 0 24 24"
+          height="24"
+          width="24"
+          preserveAspectRatio="xMidYMid meet"
+          version="1.1"
+          x="0px"
+          y="0px"
+          enableBackground="new 0 0 24 24"
+        >
+          <title>ptt</title>
+          <path
+            fill="currentColor"
+            d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
+          ></path>
+        </svg>
+      );
+    }
+  };
+
+  function showImagePreview() {
+    const image = imageInputRef.current.files[0];
+    if (image) {
+      setIsPreviewHidden(false);
+      const url = URL.createObjectURL(image);
+      setImageUrl(url);
+      setSendIcon(
+        <svg
+          viewBox="0 0 24 24"
+          height="24"
+          width="24"
+          preserveAspectRatio="xMidYMid meet"
+          version="1.1"
+          x="0px"
+          y="0px"
+          enableBackground="new 0 0 24 24"
+        >
+          <title>send</title>
+          <path
+            fill="currentColor"
+            d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z"
+          ></path>
+        </svg>
+      );
+    }
+  }
+
+  function closePreview() {
+    setIsPreviewHidden(true);
+    setImageUrl(null);
+    setSendIcon(
+      <svg
+        viewBox="0 0 24 24"
+        height="24"
+        width="24"
+        preserveAspectRatio="xMidYMid meet"
+        version="1.1"
+        x="0px"
+        y="0px"
+        enableBackground="new 0 0 24 24"
+      >
+        <title>ptt</title>
+        <path
+          fill="currentColor"
+          d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
+        ></path>
+      </svg>
+    );
   }
 
   const handleSendImage = async () => {
@@ -299,36 +336,37 @@ function Clicked({ chatData, me }) {
           body: formData,
           credentials: 'include',
         });
-        // socket.emit("sendImage", { senderId, receiverId, text: URL.createObjectURL(file), createdAtFormatted: time });
-        // setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, image: data.image, createdAtFormatted: time}]);
         if (response.ok) {
           const data = await response.json();
-          console.log("image data : " , data.image);
-          socket.emit("sendImage", {senderId, receiverId, image:data.image, createdAtFormatted: time});
+          socket.emit("sendImage", { senderId, receiverId, image: data.image, createdAtFormatted: time });
+          socket.emit("getLastMsg", { senderId, receiverId });
 
-          setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, image: data.image, createdAtFormatted: time }]); 
-          setSendIcon(<svg
-            viewBox="0 0 24 24"
-            height="24"  
-            width="24"
-            preserveAspectRatio="xMidYMid meet"
-            version="1.1"
-            x="0px"
-            y="0px"
-            enableBackground="new 0 0 24 24"
-          >
-            <title>ptt</title>
-            <path
-              fill="currentColor"
-              d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
-            ></path>
-          </svg>);
+          setIsPreviewHidden(true);
+          setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, image: data.image, createdAtFormatted: time }]);
+          setImageUrl(null);
+          // handleSendIcon();
+          setSendIcon(
+            <svg
+              viewBox="0 0 24 24"
+              height="24"
+              width="24"
+              preserveAspectRatio="xMidYMid meet"
+              version="1.1"
+              x="0px"
+              y="0px"
+              enableBackground="new 0 0 24 24"
+            >
+              <title>ptt</title>
+              <path
+                fill="currentColor"
+                d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
+              ></path>
+            </svg>
+          );
         } else {
           console.error("Image upload failed");
         }
       }
-      // setImagePreview(null);
-      // setShowImageInput(false);
       if (imageInputRef.current) {
         imageInputRef.current.value = "";
       }
@@ -337,83 +375,20 @@ function Clicked({ chatData, me }) {
     }
   };
 
-  // const handleImageChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     setImagePreview(URL.createObjectURL(file));
-  //   }
-  // };
-
   const chooseSendImage = () => {
-    // setShowImageInput(true);
     if (imageInputRef.current) {
       imageInputRef.current.click();
     }
-    setSendIcon(<svg
-      viewBox="0 0 24 24"
-      height="24"
-      width="24"
-      preserveAspectRatio="xMidYMid meet"
-      version="1.1"
-      x="0px"
-      y="0px"
-      enableBackground="new 0 0 24 24"
-    >
-      <title>send</title>
-      <path
-        fill="currentColor"
-        d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z"
-      ></path>
-    </svg>)
   };
 
-  // const removePreview = () => {
-  //   setImagePreview(null);
-  //   if (imageInputRef.current) {
-  //     imageInputRef.current.value = "";
-  //   }
-  // };
+  const changeEmojiState = () => {
+    setIsEmojiHidden(!isEmojiHidden);
+  }
 
-  // function showPreview(file) {
-  //   const preview = document.createElement('div');
-  //   preview.classList.add('preview');
-  //   preview.append(file);
-  // }
-
-  // sendIcon = (imagePreview || msg.trim !== "") ? (<svg
-  //   viewBox="0 0 24 24"
-  //   height="24"
-  //   width="24"
-  //   preserveAspectRatio="xMidYMid meet"
-  //   version="1.1"
-  //   x="0px"
-  //   y="0px"
-  //   enableBackground="new 0 0 24 24"
-  // >
-  //   <title>send</title>
-  //   <path
-  //     fill="currentColor"
-  //     d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z"
-  //   ></path>
-  // </svg>) : (
-  //   <svg
-  //     viewBox="0 0 24 24"
-  //     height="24"
-  //     width="24"
-  //     preserveAspectRatio="xMidYMid meet"
-  //     version="1.1"
-  //     x="0px"
-  //     y="0px"
-  //     enableBackground="new 0 0 24 24"
-  //   >
-  //     <title>ptt</title>
-  //     <path
-  //       fill="currentColor"
-  //       d="M11.999,14.942c2.001,0,3.531-1.53,3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531 S8.469,2.35,8.469,4.35v7.061C8.469,13.412,9.999,14.942,11.999,14.942z M18.237,11.412c0,3.531-2.942,6.002-6.237,6.002 s-6.237-2.471-6.237-6.002H3.761c0,4.001,3.178,7.297,7.061,7.885v3.884h2.354v-3.884c3.884-0.588,7.061-3.884,7.061-7.885 L18.237,11.412z"
-  //     ></path>
-  //   </svg>
-  // );
-
+  const addEmoji = (emoji) => {
+    setMsg((prev) => prev + emoji);
+    handleSendIcon();
+  };
 
   return (
     <div className={styles.container}>
@@ -537,6 +512,35 @@ function Clicked({ chatData, me }) {
               </span>
             </div>
           ))}
+
+          <div style={{ display: isPreviewHidden ? "none" : "block" }}>
+            <div className={styles.preview}>
+              <div className={styles.previewImg}>
+                {imageUrl && <img src={imageUrl} alt="Preview" />}
+              </div>
+              <div className={styles.closePreview} onClick={closePreview}>
+                {close}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: isEmojiHidden ? "none" : "block" }}>
+            <div className={styles.emojiContainer}>
+              <div className={styles.emojiField}>
+                {emojis.map((emoji, index) => (
+                  <span 
+                    key={index} 
+                    onClick={() => addEmoji(emoji)}
+                    className = {styles.selectedEmoji}>
+                    {emoji}
+                  </span>
+                ))}
+              </div>
+              <div onClick={changeEmojiState}>
+                {close}
+              </div>
+            </div>
+          </div>
         </div>
 
         <input
@@ -545,7 +549,7 @@ function Clicked({ chatData, me }) {
           name='messages'
           ref={imageInputRef}
           id={styles.inputImage}
-          onChange={handleSendImage}
+          onChange={showImagePreview}
         />
 
         <div className={styles.foot}>
@@ -556,7 +560,7 @@ function Clicked({ chatData, me }) {
           </div>
           <div className={styles.chatBoard}>
             <div className={styles.keyboard}>
-              <div className={styles.emoji}>
+              <div className={styles.emojiIcon} onClick={changeEmojiState}>
                 <svg
                   viewBox="0 0 24 24"
                   height="24"
@@ -571,8 +575,8 @@ function Clicked({ chatData, me }) {
               </div>
               <div className={styles.chatField}>
                 <input onChange={(e) => {
-                  setMsg(e.target.value)
                   handleSendIcon();
+                  setMsg(e.target.value)
                 }}
                   type="text"
                   placeholder='Type a message'

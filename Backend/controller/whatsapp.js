@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import chats from "../models/chats.js";
 import path from 'path';
 
 const SECRET_KEY = "login-key";
@@ -161,7 +160,7 @@ const logout = async (req, res) => {
   try{
     const userId = req.user.userId;
     console.log("inside logout try block");
-    const user = await User.findByIdAndDelete(userId);
+    const user = await User.findByIdAndUpdate(userId, { state: "inactive" });
     if (!user) {
       console.log("logout user not found")
       return res.status(404).json({ message: "User not found" });
@@ -184,7 +183,7 @@ const Users = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized. Please log in." });
     }
 
-    const allUsers = await User.find({});
+    const allUsers = await User.find({state : "active"});
 
     if (!allUsers.length) {
       return res.status(404).json({ message: "No users found" });

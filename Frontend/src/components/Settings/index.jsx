@@ -58,6 +58,12 @@ function Settings() {
     setShowProfile(true);
   }
 
+  async function security() 
+  {
+    console.log("security page loading");
+    window.location.href = '/security';
+  }
+
   async function logOut()
   {
     console.log("log out");
@@ -141,7 +147,7 @@ function Settings() {
               </div>
             </div>
 
-            <div className={styles.moreInfo}>
+            <div className={styles.moreInfo} onClick={security}>
               <div className={styles.icon}>
                 <svg
                   viewBox="0 0 28 35"

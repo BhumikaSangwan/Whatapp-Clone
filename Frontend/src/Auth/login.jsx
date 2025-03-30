@@ -17,6 +17,10 @@ function Login() {
         console.log("handleSubmit triggered"); // Debugging log
     
         try {
+            if(formData.email === "" || formData.password === "") {
+                alert("Please fill in all the fields");
+                return;
+            }
             console.log("Inside login try block");
             
             const response = await fetch("http://localhost:9000/users/login", {
@@ -28,15 +32,18 @@ function Login() {
     
             console.log("Login request sent");
     
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-    
             const data = await response.json();
+            if (!response.ok) {
+                // throw new Error(`HTTP error! Status: ${response.status}`);
+                console.log("Error logging in:", data);
+                alert(data.message)
+                return;
+            }
+     
             console.log("Login response:", data);
     
             setFormData({ email: "", password: "" });
-            sessionStorage.clear();
+            // sessionStorage.clear();
             window.location.href = "/whatsapp";
         } 
         catch (error) {
@@ -59,9 +66,15 @@ function Login() {
                         <label htmlFor="password" className={styles.label}>Password:</label>
                         <input type="password" id="password" name="password" className={styles.box} placeholder="Enter your password" onChange={handleChange} required/>
                     </div>
+                    <div className={styles.forgot}>
+                        <a href="./getEmail">Forgot Password?</a>
+                    </div>
                     <button type="submit" className={styles.submitBtn} onClick={handleSubmit}>Login</button>
                 </form>
-                <a href="./signUp" className={styles.change}>Sign Up</a>
+                <div className={styles.change}>
+                    <span>Don't have an account? </span>
+                    <a href="./signUp" className={styles.change}>Sign Up</a>
+                </div>
             </div>
         </div>
     )

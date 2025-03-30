@@ -24,7 +24,7 @@ function signUp() {
             const data = await response.json();
             console.log("Sign up request sent");
             if (response.ok) {
-                alert("Signup successful! directing to Whatsapp...");
+                // alert("Signup successful! directing to Whatsapp...");
                 window.location.href = "/login";
             } else {
                 alert(data.message);
@@ -52,7 +52,10 @@ function signUp() {
                     </div>
                     <button type="submit" className={styles.submitBtn} onClick = {handleSubmit}>Sign Up</button>
                 </form>
-                <a href="./login" className={styles.change}>Login</a>
+                <div className={styles.change}>
+                    <span>Already have an account? </span>
+                    <a href="./login" className={styles.change}>Login</a>
+                </div>
             </div>
         </div>
     )
