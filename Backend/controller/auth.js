@@ -12,7 +12,6 @@ const __dirname = path.dirname(__filename);
 const SECRET_KEY = "login-key";
 const app = express();
 const generatedOtp =  () => Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-// const resetRequests = []
 
 
 app.use(cookieParser());
@@ -26,8 +25,6 @@ const home = (req, res) => {
 
 // Email route
 const email = (req, res) => {
-  console.log("Email request received");
-  // res.json({message : "Welcome to the Chat App!"});
   const transporter = nodemailer.createTransport({
     // host: "smtp.ethereal.email",
     service: "gmail",
@@ -44,7 +41,6 @@ const email = (req, res) => {
 
     const user = await User.findOne({ email: userEmail, state: "active" });
     if (!user) {
-      // console.log("User not found");
       return res.status(401).json({ message: "User does not exist" });
     }
     const userOtp = generatedOtp();
@@ -55,10 +51,9 @@ const email = (req, res) => {
 
     const info = await transporter.sendMail({
       from: '"Whatsapp Clone" <dummyfortesting136@gmail.com>',
-      // to: userEmail,
-      to : "bhumikasangwan1362006@gmail.com",
+      to: userEmail,
       subject: "Reset Password",
-      text: "Check your email", // falls back to text if html is not supported/rendered by email client
+      text: "Check your email", 
       html: "<b>Your 6-digits OTP to reset the password : " + userOtp + ".<br/>Do not share it with anyone.</b>",
     });
 
@@ -85,10 +80,8 @@ const email = (req, res) => {
 
 
 const otp = async (req, res) => {
-  console.log("OTP request handled!");
   const { otp } = req.body;
   const resetToken = req.cookies.resetToken;
-  console.log("otp:", otp);
 
   jwt.verify(resetToken, SECRET_KEY, async (err, decoded) => {
     if (err) {
@@ -96,22 +89,17 @@ const otp = async (req, res) => {
     }
 
     const { email } = decoded;
-    console.log("email in otp:", email);
     
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("user otp : ", user.otp);
-    console.log("input otp : ", otp)
     if (user.otp != otp) {
-      console.log("otp didn't match");
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
     const otpVerifiedToken = jwt.sign({ verified: true }, SECRET_KEY, { expiresIn: '5m' });
-    console.log("otp token set");
     res.cookie('otpVerifiedToken', otpVerifiedToken, {
       httpOnly: true,
       secure: false,
@@ -119,7 +107,6 @@ const otp = async (req, res) => {
       maxAge: 5 * 60 * 1000
     });
 
-    console.log("OTP verified");
     return res.status(200).json({ message: "OTP verified successfully" });
   });
 };
@@ -132,7 +119,6 @@ const resetPwd = async (req, res) => {
     const { newPassword } = req.body;
 
     if (!newPassword) {
-      console.log("new pwd not found");
       return res.status(400).json({ message: "New password is required" });
     }
 
@@ -189,12 +175,10 @@ const resetPwd = async (req, res) => {
 
 
 const login = async (req, res) => {
-  console.log("Login request received");
   res.header("Access-Control-Allow-Origin", "http://localhost:5173");
   res.header("Access-Control-Allow-Credentials", "true");
 
   const { email, password } = req.body;
-  console.log("Body:", req.body);
   res.clearCookie("resetToken");
   res.clearCookie("otpVerifiedToken");
 
@@ -227,7 +211,6 @@ const login = async (req, res) => {
       maxAge: 3600000
     });
 
-    console.log("Token generated:", token);
     res.status(200).json({ message: "Login successful", token });
 
   } catch (error) {
@@ -238,9 +221,7 @@ const login = async (req, res) => {
 
 // Sign-up route
 const signUp = async (req, res) => {
-  console.log("Sign Up request received");
   const { username, email, password } = req.body;
-  console.log("Body:", req.body);
 
   try {
     const existingUser = await User.findOne({ email });
@@ -258,7 +239,6 @@ const signUp = async (req, res) => {
     });
 
     await newUser.save();
-    console.log("User created successfully!");
 
     res.status(201).json({ message: "User registered successfully" });
 
@@ -267,11 +247,5 @@ const signUp = async (req, res) => {
     res.status(500).json({ message: "Error during registration", error });
   }
 };
-
-// Check cookies route
-// const checkCookies = (req, res) => {
-//   console.log("Cookies received:", req.cookies);
-//   res.json({ cookies: req.cookies || "No cookies found" });
-// };
 
 export { home, login, signUp, email, resetPwd, otp };

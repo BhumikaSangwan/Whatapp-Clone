@@ -9,9 +9,6 @@ import Head from "../Head/index.jsx";
 import socket from './connection.jsx';
 
 export default function Chats({ onChatClick }) {
-
-
-    // console.log("chats");
     const back = (
         <svg viewBox="0 0 24 24" height="24" width="24">
             <title>back</title>
@@ -33,7 +30,6 @@ export default function Chats({ onChatClick }) {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                // console.log("fetch users request");
                 const response = await fetch(
                     "http://localhost:9000/whatsapp/users",
                     {
@@ -41,12 +37,9 @@ export default function Chats({ onChatClick }) {
                     }
                 );
                 const { users, me } = await response.json();
-                // console.log("users data : ", users);
-                console.log("me  : ", me)
 
                 setUsers(users);
                 setMe(me);
-                // console.log("emitting the connected event")
                 socket.emit('connected', me[0]._id);
             } catch (error) {
                 console.error("Error fetching users:", error);
@@ -128,8 +121,6 @@ export default function Chats({ onChatClick }) {
             </div>
 
             <div className={styles.contactList}>
-                {/* {displayedChats.length > 0 ? (
-                    displayedChats.map((chat) => { */}
                 {users ? (
                     users.map((chat) => {
                         return (

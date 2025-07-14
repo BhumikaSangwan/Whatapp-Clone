@@ -11,10 +11,8 @@ function App() {
   const [option, setOption] = useState("Chats");
 
   const handleChatClick = (chatData, me) => {
-    // console.log("chat clicked");
     setSelectedChat(chatData)
     setMe(me);
-    // console.log("selected chat : ",selectedChat)
   }
 
   const handleOption = (selection) => {

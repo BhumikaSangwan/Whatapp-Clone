@@ -14,14 +14,12 @@ function Login() {
     
       const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("handleSubmit triggered"); // Debugging log
     
         try {
             if(formData.email === "" || formData.password === "") {
                 alert("Please fill in all the fields");
                 return;
             }
-            console.log("Inside login try block");
             
             const response = await fetch("http://localhost:9000/users/login", {
                 method: "POST",
@@ -30,7 +28,6 @@ function Login() {
                 body: JSON.stringify(formData),
             });
     
-            console.log("Login request sent");
     
             const data = await response.json();
             if (!response.ok) {
@@ -40,7 +37,6 @@ function Login() {
                 return;
             }
      
-            console.log("Login response:", data);
     
             setFormData({ email: "", password: "" });
             // sessionStorage.clear();

@@ -6,7 +6,6 @@ import User from '../models/user.js'
 import Messages from '../models/messageSchema.js'
 import { getWhatsAppData, Users, Name, About, Profile, userProfile, updateName, updateAbout, logout, sendUserId } from "../controller/whatsapp.js";
 
-// const routerServer = ({ server, users }) => {
 
 const router = express.Router();
 
@@ -14,8 +13,6 @@ router.use(authMiddleware);
 
 router.get("/", getWhatsAppData);
 router.get("/users", Users)
-// router.get("/chats", userChats);
-// router.get('/me', sendUserId);
 router.get('/getName', Name);
 router.get('/getAbout', About);
 router.get('/getProfile', Profile);
@@ -63,12 +60,6 @@ router.post('/uploadProfile', upload.single('profilePic'), async (req, res) => {
         console.log("upload profile request handled");
         console.log("file : ", req.file)
         const userId = req.user.userId;
-        // const user = await User.findById(userId);
-        // if (!user) {
-        //     return res.status(404).json({ message: "User not found" });
-        // }
-        // user.dp = req.file.path;
-        // await user.save();
         const user = await User.findOneAndUpdate({ _id: userId }, { dp: req.file.path }, { new: true });
         res.status(200).json({ message: "File uploaded successfully", dp: user.dp });
     } catch (err) {
@@ -85,23 +76,6 @@ router.post('/imageMsg', upload.single('messages'), async (req, res) => {
         const newMessage = new Messages({ senderId, receiverId, text: null, image: `/uploads/messages/${req.file.filename}`, createdAtFormatted });
         await newMessage.save();
 
-        // const receiverSocket = Object.values(server.sockets.sockets).find(socket => {
-        //     return Object.keys(users).find(key => users[key] === socket.id) === receiverId;
-        // });
-
-        // if (receiverSocket) {
-        //     receiverSocket.emit("getMessage", { senderId, receiverId, image: imagePath, createdAtFormatted }); 
-        // }
-        // const io = req.app.get('socketio'); // Get the socket.io instance from the app
-        // const users = req.app.get('users');
-        // const receiverSocket = users[receiverId];
-        // const receiverSocket = Object.values(io.sockets.sockets).find(socket => {
-        //     return Object.keys(users).find(key => users[key] === socket.id) === receiverId;
-        // });
-
-        // if (receiverSocket) {
-        //     io.to(receiverSocket.id).emit("getMessage", { senderId, receiverId, image: imagePath, createdAtFormatted });
-        // }
         res.status(200).json({ message: "File uploaded successfully", image: `/uploads/messages/${req.file.filename}` });
     }
     catch (err) {
@@ -109,8 +83,4 @@ router.post('/imageMsg', upload.single('messages'), async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
-//     return router;
-// }
-
-// export default routerServer;
 export default router;

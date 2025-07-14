@@ -9,8 +9,6 @@ router.get('/', async (req, res) => {
         console.log("userId inside the chatlist request : ", userId);
 
         const chatList = await ChatList.findOne({ userId })
-            // .populate('chats.chatUserId', 'username dp')
-            // .lean();
 
         if (!chatList) {
             console.log("Chat list not found");

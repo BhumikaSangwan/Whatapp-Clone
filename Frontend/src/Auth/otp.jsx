@@ -7,10 +7,8 @@ function Otp() {
     
       const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("handleSubmit triggered"); 
     
         try {
-            console.log("Inside otp try block");
             
             const response = await fetch("http://localhost:9000/users/otp", {
                 method: "POST",
@@ -19,17 +17,13 @@ function Otp() {
                 body: JSON.stringify({otp }),
             });
     
-            console.log("otp page");
     
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             else{
                 const data = await response.json();
-                console.log("otp response:", data);
                 setOtp("");
-                // sessionStorage.clear();
-                // alert("Check the email");
                 window.location.href = "/resetPassword";
             }
         } 

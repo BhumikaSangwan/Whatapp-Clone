@@ -7,7 +7,6 @@ const Whatsapp = () => {
 
     useEffect(() => {
         async function checkAuth() {
-            console.log("Checking authentication...");
     
             try {
                 const response = await fetch("http://localhost:9000/whatsapp", {
@@ -16,16 +15,13 @@ const Whatsapp = () => {
                 });
     
     
-                // console.log("Response received:", response);
     
                 if (!response.ok) {
-                    console.error("Response error:", response.status);
                     setIsAuthenticated(false);
                     return;
                 }
     
                 const data = await response.json();
-                // console.log("Auth response data:", data);
     
                 if (data.message === "Authenticated") {
                     setIsAuthenticated(true);
@@ -43,7 +39,7 @@ const Whatsapp = () => {
     
 
     if (isAuthenticated === null) {
-        return <h2>Loading...</h2>;  // Shows loading while waiting for response
+        return <h2>Loading...</h2>;  
     }
 
     return isAuthenticated ? <App /> : <Navigate to="/login" />;

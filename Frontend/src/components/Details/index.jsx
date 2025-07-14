@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useLayoutEffect } from "react";
 import styles from "./styles.module.css";
 import Lens from "../Lens/index.jsx";
 import Menu from "../Menu/index.jsx";
@@ -9,8 +10,22 @@ import TailIn from "../Tail/tailIn.jsx";
 import TailOut from "../Tail/tailOut.jsx";
 import socket from '../Chats/connection.jsx';
 
+
 function Details({ selectedChat, me }) {
   const [animate, setAnimate] = useState(false);
+
+  // useEffect(() => {
+  //   console.log("[Details] socket.current is:", socket);
+
+  //   socket.on('connect', () => {
+  //     console.log('Connected to socket with ID:', socket.id);
+  //   });
+
+  //   return () => {
+  //     socket.off('connect');
+  //   };
+  // }, []);
+
 
   useEffect(() => {
     if (selectedChat) {
@@ -81,6 +96,8 @@ function Clicked({ chatData, me }) {
   const [isPreviewHidden, setIsPreviewHidden] = useState(true);
   const [isEmojiHidden, setIsEmojiHidden] = useState(true);
   const [imageUrl, setImageUrl] = useState(null);
+  const chatEndRef = useRef(null);
+
   const close = <svg
     viewBox="0 0 24 24"
     height="24"
@@ -122,6 +139,19 @@ function Clicked({ chatData, me }) {
     ></path>
   </svg>);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatBody]);
+
+  useLayoutEffect(() => {
+    if (!chatEndRef.current) return;
+
+    // Initial scroll
+    scrollToBottom();
+
+    return () => observer.disconnect();
+  }, []);
+
 
   useEffect(() => {
     socket.on("isOnline", (data) => {
@@ -137,6 +167,27 @@ function Clicked({ chatData, me }) {
       socket.off("isOnline");
     }
   }, [])
+
+
+  useEffect(() => {
+    if (!chatData || !me[0]) return;
+
+    socket.emit("getMissedMessages", {
+      senderId: chatData._id,
+      receiverId: me[0]._id,
+    });
+
+    const handleMissedMessages = (messages) => {
+      setChatBody((prev) => [...prev, ...messages]);
+      scrollToBottom();
+    };
+
+    socket.on("missedMessages", handleMissedMessages);
+
+    return () => {
+      socket.off("missedMessages", handleMissedMessages);
+    };
+  }, [chatData._id, me]);
 
 
   useEffect(() => {
@@ -192,6 +243,12 @@ function Clicked({ chatData, me }) {
     fetchMessages();
   }, [chatData._id, me]);
 
+  const scrollToBottom = () => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollTop = chatEndRef.current.scrollHeight;
+    }
+  };
+
 
   const sendMessage = async () => {
     try {
@@ -204,10 +261,25 @@ function Clicked({ chatData, me }) {
       setIsEmojiHidden(true);
       if (text) {
         console.log("msg to be sent : ", text);
-        setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, text, createdAtFormatted: time }]);
-        socket.emit("sendMessage", { senderId, receiverId, text, createdAtFormatted: time });
-        socket.emit("getLastMsg", { senderId, receiverId });
-        setMsg("");
+        socket.emit("sendMessage", { senderId, receiverId, text, createdAtFormatted: time }, (response) => {
+          if (response.success) {
+            // Only append if server saved successfully
+            setChatBody((prevChatBody) => [
+              ...prevChatBody,
+              {
+                senderId,
+                receiverId,
+                text,
+                createdAtFormatted: time,
+              },
+            ]);
+
+            socket.emit("getLastMsg", { senderId, receiverId });
+            setMsg("");
+          } else {
+            console.error("Message not saved:", response.message);
+          }
+        });
       }
       else if (imageUrl) {
         handleSendImage();
@@ -315,6 +387,10 @@ function Clicked({ chatData, me }) {
         ></path>
       </svg>
     );
+
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
   }
 
   const handleSendImage = async () => {
@@ -344,7 +420,6 @@ function Clicked({ chatData, me }) {
           setIsPreviewHidden(true);
           setChatBody((prevChatBody) => [...prevChatBody, { senderId, receiverId, image: data.image, createdAtFormatted: time }]);
           setImageUrl(null);
-          // handleSendIcon();
           setSendIcon(
             <svg
               viewBox="0 0 24 24"
@@ -474,7 +549,7 @@ function Clicked({ chatData, me }) {
       {/* Body */}
 
       <div className={styles.body}>
-        <div className={styles.description} id="chatBody">
+        <div className={styles.description} id="chatBody" ref={chatEndRef}>
           {chatBody.map((msg, index) => (
             <div key={index} >
               <span >
@@ -482,7 +557,6 @@ function Clicked({ chatData, me }) {
                   <div className={`${styles.alignMsg} ${styles.alignRight}`}>
                     <div className={styles.showMsg} >
                       <span className={styles.msg}>
-                        {/* <span className={styles.msgText}>{msg.text}</span> */}
                         {msg.image ? (
                           <img src={`http://localhost:9000${msg.image}`} alt="message image" className={styles.msgImage} />
                         ) :
@@ -528,10 +602,10 @@ function Clicked({ chatData, me }) {
             <div className={styles.emojiContainer}>
               <div className={styles.emojiField}>
                 {emojis.map((emoji, index) => (
-                  <span 
-                    key={index} 
+                  <span
+                    key={index}
                     onClick={() => addEmoji(emoji)}
-                    className = {styles.selectedEmoji}>
+                    className={styles.selectedEmoji}>
                     {emoji}
                   </span>
                 ))}

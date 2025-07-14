@@ -3,8 +3,6 @@ import jwt from "jsonwebtoken";
 const SECRET_KEY = "login-key";
 
 const authMiddleware = (req, res, next) => {
-    console.log("Middleware execution in WhatsApp route...");
-    // console.log("Cookie data:", req.cookies);
 
     const token = req.cookies.token;
 
@@ -19,8 +17,6 @@ const authMiddleware = (req, res, next) => {
             return res.status(401).json({ message: "Unauthorized" });
         } else {
             req.user = decoded;
-            console.log("token valid");
-            // console.log("User authenticated:", decoded);
             next();
         }
     });

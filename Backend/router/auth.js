@@ -9,6 +9,5 @@ router.post('/signUp', signUp);
 router.post('/getEmail', email);
 router.post('/resetPwd', resetPwd);
 router.post('/otp', otp);
-// router.get('/checkCookies', checkCookies);
 
 export default router;

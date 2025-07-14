@@ -1,0 +1,11 @@
+# node modules
+**/node_modules/
+
+# environment files
+*.env
+
+# build and log files
+*.log
+
+# media uploads
+/uploads/messages/

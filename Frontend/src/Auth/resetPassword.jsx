@@ -31,7 +31,6 @@ function security() {
                 body: JSON.stringify({newPassword : formData.password}),
             });
             const data = await response.json();
-            console.log("reset password request sent");
             if (response.ok) {
                 window.location.href = "/login";
             } else {

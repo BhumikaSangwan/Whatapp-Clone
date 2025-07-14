@@ -7,10 +7,8 @@ function Email() {
     
       const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("handleSubmit triggered"); 
     
         try {
-            console.log("Inside forgot pwd try block");
             
             const response = await fetch("http://localhost:9000/users/getEmail", {
                 method: "POST",
@@ -19,14 +17,11 @@ function Email() {
                 body: JSON.stringify({email }),
             });
     
-            console.log("forgot pwd request sent");
-    
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
     
             const data = await response.json();
-            console.log("forgot pwd response:", data);
             setEmail("");
             sessionStorage.clear();
             alert("Check the email");

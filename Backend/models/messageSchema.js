@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import User from './user.js';
+import { status } from '../constants/index.js';
 
 const messageSchema = new mongoose.Schema({
     senderId : {
@@ -30,6 +31,10 @@ const messageSchema = new mongoose.Schema({
     readAt : {
         type : Date,
         default : null
+    },
+    seen: {
+        type : Number,
+        default: status.undelivered
     } 
 })
 

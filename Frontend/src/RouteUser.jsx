@@ -6,11 +6,6 @@ import Otp from './Auth/otp.jsx';
 import ResetPwd from './Auth/resetPassword.jsx'
 import Whatsapp from './Auth/whatsapp.jsx'
 
-// const PrivateRoute = ({ element }) => {
-//   // const token = localStorage.getItem("token");
-
-//   return token ? element : <Navigate to="/login" />;
-// };
 
 function RouteUser() {
   return (

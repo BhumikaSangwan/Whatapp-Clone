@@ -22,7 +22,6 @@ function signUp() {
                 body: JSON.stringify(formData),
             });
             const data = await response.json();
-            console.log("Sign up request sent");
             if (response.ok) {
                 // alert("Signup successful! directing to Whatsapp...");
                 window.location.href = "/login";

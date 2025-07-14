@@ -5,7 +5,6 @@ import Head from '../Head/index.jsx'
 import Lock from '../Lock/index.jsx'
 
 function index() {
-    // const chatData = ChatData();
     const [chatData, setChatData] = useState([]);
 
     useEffect(() => {
@@ -16,7 +15,6 @@ function index() {
               credentials: "include"
             });
             const data = await response.json();
-            console.log("Received chat data:", data);
     
             setChatData(data);
           } catch (error) {
@@ -27,7 +25,6 @@ function index() {
         fetchChatData();
       }, []);
 
-    console.log(chatData)
     return (
         <div>
             <div className={styles.container} >

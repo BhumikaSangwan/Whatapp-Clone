@@ -13,18 +13,6 @@ function index() {
     </svg>
   );
 
-  // const chatData = [
-  //   {
-  //     name: 'Matlabi Duniya',
-  //     dp: (
-  //       <img
-  //         src="https://pps.whatsapp.net/v/t61.24694-24/378041669_643376800929196_2650649287054504503_n.jpg?stp=dst-jpg_s192x192_tt6&amp;ccb=11-4&amp;oh=01_Q5AaICpIOfbFgNUM98KLQ5Xecu4vlP2HiNNDu90QTYsRSUKd&amp;oe=67BA3FC4&amp;_nc_sid=5e03e0&amp;_nc_cat=104"
-  //         alt="Matlabi Duniya"
-  //       />
-  //     ),
-  //     messages: [{ sender: 'Matlabi Duniya', text: 'Send this to her 😂❤️ ', time: '21:41 PM' }],
-  //   },
-  // ];
 
   return (
     <>
@@ -46,13 +34,11 @@ function index() {
         </div>
       </div>
       <div className={styles.channel}>
-        {/* <ShowContact chatData={chatData[0]} /> */}
         <span className={styles.channelDp}>
           <img height="49px" width="49px"
             src="https://pps.whatsapp.net/v/t61.24694-24/378041669_643376800929196_2650649287054504503_n.jpg?stp=dst-jpg_s192x192_tt6&amp;ccb=11-4&amp;oh=01_Q5AaICpIOfbFgNUM98KLQ5Xecu4vlP2HiNNDu90QTYsRSUKd&amp;oe=67BA3FC4&amp;_nc_sid=5e03e0&amp;_nc_cat=104"
             alt="Matlabi Duniya" className={styles.channelImage}
           />
-          {/* <img alt="" height="49px" width="49px" draggable="false" className="x1n2onr6 x1lliihq xh8yej3 x5yr21d x6ikm8r x10wlt62 x14yjl9h xudhj91 x18nykt9 xww2gxu xl1xv1r x115dhu7 x17vty23 x1hc1fzr _ao3e" tabIndex="-1" src="https://pps.whatsapp.net/m1/v/t24/An8a3a5j5g3SCx_XoBmNuB6rjT6thGRINnXKjN8iSU-J-ekjXftabjORxsaVPrZq53sju_B-azndJYkuvCxNO0acczIkP7I_U-RWTO9CmJlp6FJn-vSZz_C2Go_j6COombz_JCeAt0YF1bj65r4?stp=dst-jpg_s192x192_tt6&amp;ccb=10-5&amp;oh=01_Q5AaIHY_F4MGAj3gG4PWWBOVxSNwMpciK25H_HZtiau04Hu7&amp;oe=67BA7BED&amp;_nc_sid=5e03e0&amp;_nc_cat=102" /> */}
         </span>
         <div className={styles.info}>
           <div className={styles.showName}>

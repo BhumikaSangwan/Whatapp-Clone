@@ -19,7 +19,6 @@ function index({ chatData, userId }) {
         },
         credentials: 'include',
       });
-      // console.log("inside getProfile function")
       if (!response.ok) {
         if (response.status === 200) {
           setProfile(null);
@@ -46,7 +45,6 @@ function index({ chatData, userId }) {
   }
 
   useEffect(() => {
-    // console.log("useeffect")
     getProfile();
     getLastMessage();
   }, [chatData, userId]);
@@ -55,7 +53,6 @@ function index({ chatData, userId }) {
 
   useEffect(() => {
     function handleLastMsg(user) {
-      // console.log("handling last msg : ", user);
       if (
         (user.senderId === chatData._id.toString() && user.receiverId === userId.toString()) ||
         (user.senderId === userId.toString() && user.receiverId === chatData._id.toString())
@@ -63,8 +60,6 @@ function index({ chatData, userId }) {
         setMessageKey((prevKey) => prevKey + 1);
 
         if(user.text){
-          // console.log("received msg is a text.......");
-
           setDisplayMessage(
             <span className={styles.lastMsg}>
             {user.senderId === userId.toString() && <Seen/> }
@@ -73,7 +68,6 @@ function index({ chatData, userId }) {
           );
         }
         else if(user.image){
-          // console.log("received msg is an image.........");
           setDisplayMessage(
             <span className={styles.lastMsg} key={messageKey}>
               {user.senderId === userId.toString() && <Seen/> }
@@ -101,7 +95,6 @@ function index({ chatData, userId }) {
       }
     }
 
-    // console.log("handling last message socket");
     socket.on("lastMsg", handleLastMsg);
 
 

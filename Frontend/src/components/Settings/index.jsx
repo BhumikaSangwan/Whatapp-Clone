@@ -54,26 +54,21 @@ function Settings() {
   }, []);
 
   function visitProfile() {
-    console.log("go to profile page");
     setShowProfile(true);
   }
 
   async function security() 
   {
-    console.log("security page loading");
     window.location.href = '/security';
   }
 
   async function logOut()
   {
-    console.log("log out");
     const response = await fetch("http://localhost:9000/whatsapp/logout", {
                       method: "POST",
                       credentials : "include"
     })  
     if(response.ok){
-      // const data = await response.json();
-      console.log("logged out successfully");
       window.location.href = '/signUp';
     }
     else{
